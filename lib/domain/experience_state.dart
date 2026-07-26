@@ -58,6 +58,5 @@ enum ExperienceState {
       this == ExperienceState.fallbackGroundObserve ||
       this == ExperienceState.fallbackGroundNarration;
 
-  bool get isTerminalState =>
-      this == ExperienceState.completed;
+  bool get isTerminalState => this == ExperienceState.completed;
 }

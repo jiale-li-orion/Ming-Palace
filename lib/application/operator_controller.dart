@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../domain/experience_event.dart';
+import '../domain/experience_state.dart';
 import 'experience_controller.dart';
 
 /// Operator panel controller (Project.md §5.6).
@@ -16,8 +17,22 @@ import 'experience_controller.dart';
 /// telemetry repository on every change.
 class OperatorController extends ChangeNotifier {
   final ExperienceEngine _engine;
+  final VoidCallback? _onReplayAudio;
+  final Future<void> Function()? _onExportLog;
+  final Future<void> Function()? _onViewLog;
+  final Future<void> Function()? _onClearData;
 
-  OperatorController(this._engine) : _panelVisible = false;
+  OperatorController(
+    this._engine, {
+    VoidCallback? onReplayAudio,
+    Future<void> Function()? onExportLog,
+    Future<void> Function()? onViewLog,
+    Future<void> Function()? onClearData,
+  })  : _onReplayAudio = onReplayAudio,
+        _onExportLog = onExportLog,
+        _onViewLog = onViewLog,
+        _onClearData = onClearData,
+        _panelVisible = false;
 
   // ---- internal state ------------------------------------------------------
 
@@ -62,37 +77,52 @@ class OperatorController extends ChangeNotifier {
   // ---- operator actions ----------------------------------------------------
 
   /// Advances the experience by one step (operator override).
-  void nextStep() => _engine.handleEvent(
-        const OperatorAction(OperatorActionType.nextStep),
-      );
+  void nextStep() => _engine.operatorNext();
 
   /// Switches to the normal (ascend-to-platform) route.
   void switchToNormalRoute() {
-    _engine.setRoute('normal');
-    _engine.handleEvent(
-      const OperatorAction(OperatorActionType.switchToNormal),
-    );
+    if (_engine.setRoute('normal')) {
+      _engine.handleEvent(
+        const OperatorAction(OperatorActionType.switchToNormal),
+      );
+    }
   }
 
   /// Switches to the fallback (ground-level) route.
   void switchToFallbackRoute() {
-    _engine.setRoute('fallback');
-    _engine.handleEvent(
-      const OperatorAction(OperatorActionType.switchToFallback),
-    );
+    if (_engine.setRoute('fallback')) {
+      _engine.handleEvent(
+        const OperatorAction(OperatorActionType.switchToFallback),
+      );
+    }
   }
 
   /// Replays the current audio narration.
-  void replayAudio() => _engine.handleEvent(
-        const OperatorAction(OperatorActionType.replayAudio),
-      );
+  void replayAudio() {
+    _engine.recordOperatorAction('replay_audio');
+    _onReplayAudio?.call();
+  }
+
+  Future<void> exportLog() async {
+    _engine.recordOperatorAction('export_log');
+    await _onExportLog?.call();
+  }
+
+  Future<void> viewLog() async {
+    _engine.recordOperatorAction('view_log');
+    await _onViewLog?.call();
+  }
+
+  void jumpToState(ExperienceState state) => _engine.operatorJump(state);
+
+  Future<void> clearData() async {
+    await _onClearData?.call();
+  }
 
   /// Records a help request (user asked for assistance during testing).
   void markNeedsHelp() {
     _helpRequestCount++;
-    _engine.handleEvent(
-      const OperatorAction(OperatorActionType.markNeedsHelp),
-    );
+    _engine.markNeedsHelp();
     notifyListeners();
   }
 
@@ -114,13 +144,8 @@ class OperatorController extends ChangeNotifier {
   }
 
   /// Steps backward through the experience (operator override).
-  void previousStep() => _engine.handleEvent(
-        const OperatorAction(OperatorActionType.previousStep),
-      );
+  void previousStep() => _engine.operatorPrevious();
 
   /// Ends the current session (marks it as interrupted).
-  void endSession() => _engine.handleEvent(
-        const OperatorAction(OperatorActionType.endSession),
-      );
-
+  void endSession() => unawaited(_engine.endSession());
 }

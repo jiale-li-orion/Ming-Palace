@@ -14,19 +14,23 @@ import 'scene_renderer.dart';
 /// Displays the scene background image and animates through [VisualLayer]s
 /// with staggered fade-ins driven by [VisualLayer.startMs] delays.
 ///
-/// Auto-advances after [SceneDefinition.minimumDurationMs] if
-/// [SceneDefinition.autoAdvance] is true; otherwise a "继续" button is
-/// shown when `allowedActions` includes `"continue"`.
+/// Auto-advance is coordinated by [ExperienceScreen]. This renderer only
+/// owns its visual animations and the minimum-observation countdown.
 class LayeredReconstructionRenderer implements SceneRenderer {
   final void Function(ExperienceEvent) onEvent;
+  final ValueChanged<String>? onAssetError;
 
-  const LayeredReconstructionRenderer({required this.onEvent});
+  const LayeredReconstructionRenderer({
+    required this.onEvent,
+    this.onAssetError,
+  });
 
   @override
   Widget build(BuildContext context, SceneViewModel viewModel) {
     return _LayeredView(
       viewModel: viewModel,
       onEvent: onEvent,
+      onAssetError: onAssetError,
     );
   }
 }
@@ -34,7 +38,12 @@ class LayeredReconstructionRenderer implements SceneRenderer {
 class _LayeredView extends StatefulWidget {
   final SceneViewModel viewModel;
   final void Function(ExperienceEvent) onEvent;
-  const _LayeredView({required this.viewModel, required this.onEvent});
+  final ValueChanged<String>? onAssetError;
+  const _LayeredView({
+    required this.viewModel,
+    required this.onEvent,
+    this.onAssetError,
+  });
 
   @override
   State<_LayeredView> createState() => _LayeredViewState();
@@ -42,15 +51,18 @@ class _LayeredView extends StatefulWidget {
 
 class _LayeredViewState extends State<_LayeredView>
     with TickerProviderStateMixin {
-  Timer? _autoAdvanceTimer;
+  Timer? _countdownTimer;
+  late int _remainingMs;
   final Map<int, AnimationController> _controllers = {};
   final Map<int, Animation<double>> _animations = {};
+  final Set<String> _reportedMissingAssets = {};
 
   @override
   void initState() {
     super.initState();
+    _remainingMs = widget.viewModel.minimumDurationMs;
     _setupLayers();
-    _setupAutoAdvance();
+    _setupCountdown();
   }
 
   @override
@@ -61,8 +73,9 @@ class _LayeredViewState extends State<_LayeredView>
             widget.viewModel.visualLayers.length) {
       _clearControllers();
       _setupLayers();
-      _cancelAutoAdvance();
-      _setupAutoAdvance();
+      _cancelCountdown();
+      _remainingMs = widget.viewModel.minimumDurationMs;
+      _setupCountdown();
     }
   }
 
@@ -90,23 +103,19 @@ class _LayeredViewState extends State<_LayeredView>
     }
   }
 
-  void _setupAutoAdvance() {
-    final vm = widget.viewModel;
-    if (vm.autoAdvance && vm.minimumDurationMs > 0) {
-      _autoAdvanceTimer = Timer(
-        Duration(milliseconds: vm.minimumDurationMs),
-        () {
-          if (mounted) {
-            widget.onEvent(const TimerElapsed());
-          }
-        },
-      );
-    }
+  void _setupCountdown() {
+    if (_remainingMs <= 0) return;
+    _countdownTimer =
+        Timer.periodic(const Duration(milliseconds: 250), (timer) {
+      if (!mounted) return;
+      setState(() => _remainingMs = (_remainingMs - 250).clamp(0, 1 << 30));
+      if (_remainingMs == 0) timer.cancel();
+    });
   }
 
-  void _cancelAutoAdvance() {
-    _autoAdvanceTimer?.cancel();
-    _autoAdvanceTimer = null;
+  void _cancelCountdown() {
+    _countdownTimer?.cancel();
+    _countdownTimer = null;
   }
 
   void _clearControllers() {
@@ -119,7 +128,7 @@ class _LayeredViewState extends State<_LayeredView>
 
   @override
   void dispose() {
-    _cancelAutoAdvance();
+    _cancelCountdown();
     _clearControllers();
     super.dispose();
   }
@@ -140,8 +149,10 @@ class _LayeredViewState extends State<_LayeredView>
           Image.asset(
             bgPath,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) =>
-                Container(color: AppColors.background),
+            errorBuilder: (_, __, ___) {
+              _reportMissingAsset(rawBg!);
+              return _assetPlaceholder(rawBg);
+            },
           )
         else
           Container(color: AppColors.background),
@@ -166,12 +177,18 @@ class _LayeredViewState extends State<_LayeredView>
               child: SizedBox(
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {
-                    widget.onEvent(
-                      const UserAction(UserActionType.continue_),
-                    );
-                  },
-                  child: const Text('继续'),
+                  onPressed: _remainingMs > 0
+                      ? null
+                      : () {
+                          widget.onEvent(
+                            const UserAction(UserActionType.continue_),
+                          );
+                        },
+                  child: Text(
+                    _remainingMs > 0
+                        ? '请观察 ${(_remainingMs / 1000).ceil()} 秒'
+                        : '继续',
+                  ),
                 ),
               ),
             ),
@@ -191,6 +208,7 @@ class _LayeredViewState extends State<_LayeredView>
           'assets/${layer.asset}',
           fit: BoxFit.cover,
           errorBuilder: (_, error, __) {
+            _reportMissingAsset(layer.asset);
             // Graceful fallback: show a placeholder with the asset name.
             return Container(
               color: AppColors.surface.withOpacity(0.6),
@@ -205,7 +223,8 @@ class _LayeredViewState extends State<_LayeredView>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      layer.asset.split('/').last,
+                      'PLACEHOLDER\n${layer.asset.split('/').last}',
+                      textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: AppColors.textDisabled,
                         fontSize: 11,
@@ -219,5 +238,26 @@ class _LayeredViewState extends State<_LayeredView>
         ),
       ),
     );
+  }
+
+  Widget _assetPlaceholder(String asset) => Container(
+        color: AppColors.background,
+        alignment: Alignment.center,
+        child: Text(
+          'PLACEHOLDER\n${asset.split('/').last}',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: AppColors.textDisabled,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      );
+
+  void _reportMissingAsset(String asset) {
+    if (!_reportedMissingAssets.add(asset)) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.onAssetError?.call(asset);
+    });
   }
 }

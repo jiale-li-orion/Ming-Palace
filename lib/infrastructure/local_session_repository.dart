@@ -23,8 +23,10 @@ abstract interface class SessionRepository {
   /// Persists the current experience state + audio position.
   Future<Result<void, AppError>> saveState(
     ExperienceState state,
-    int audioPositionMs,
-  );
+    int audioPositionMs, {
+    String routeId = 'normal',
+    String? audioAsset,
+  });
 
   /// Deletes the saved state file (e.g. after a clean session end).
   Future<Result<void, AppError>> clearSavedState();
@@ -72,8 +74,10 @@ class LocalSessionRepository implements SessionRepository {
   @override
   Future<Result<void, AppError>> saveState(
     ExperienceState state,
-    int audioPositionMs,
-  ) async {
+    int audioPositionMs, {
+    String routeId = 'normal',
+    String? audioAsset,
+  }) async {
     try {
       // Preserve the sessionId from any previously saved state.
       if (_currentSessionId == null) {
@@ -88,6 +92,8 @@ class LocalSessionRepository implements SessionRepository {
         'state': state.id,
         'audioPositionMs': audioPositionMs,
         'sessionId': _currentSessionId,
+        'route': routeId,
+        'audioAsset': audioAsset,
         'timestamp': DateTime.now().toUtc().toIso8601String(),
       };
 
@@ -116,5 +122,4 @@ class LocalSessionRepository implements SessionRepository {
     final dir = await getApplicationDocumentsDirectory();
     return File('${dir.path}/$_stateFileName');
   }
-
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/theme.dart';
 import '../../application/experience_controller.dart';
 import '../../application/operator_controller.dart';
-import '../../domain/experience_event.dart';
+import '../../domain/experience_state.dart';
 
 /// Operator panel (Project.md §5.6) — hidden panel accessible via 7-tap
 /// on the title bar.
@@ -66,6 +66,11 @@ class OperatorPanel extends StatelessWidget {
                       label: '会话',
                       value: engine.sessionId?.substring(0, 8) ?? '—',
                     ),
+                    _InfoRow(label: '路线', value: engine.currentRoute.id),
+                    _InfoRow(
+                      label: '帮助标记',
+                      value: '${controller.helpRequestCount}',
+                    ),
                     const SizedBox(height: 12),
 
                     // Route toggle
@@ -90,6 +95,18 @@ class OperatorPanel extends StatelessWidget {
                         ),
                       ],
                     ),
+                    if (engine.currentState !=
+                        ExperienceState.waitForRouteDecision)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 6),
+                        child: Text(
+                          '仅在路线决策节点可切换',
+                          style: TextStyle(
+                            color: AppColors.textDisabled,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 16),
 
                     // Navigation
@@ -113,6 +130,31 @@ class OperatorPanel extends StatelessWidget {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 8),
+                    DropdownButtonFormField<ExperienceState>(
+                      value: engine.currentState,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: '跳转到指定状态',
+                        isDense: true,
+                      ),
+                      items: ExperienceState.values
+                          .map(
+                            (state) => DropdownMenuItem(
+                              value: state,
+                              child: Text(
+                                state.id,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (state) {
+                        if (state != null && state != engine.currentState) {
+                          controller.jumpToState(state);
+                        }
+                      },
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -145,7 +187,34 @@ class OperatorPanel extends StatelessWidget {
                           child: _SmallButton(
                             label: '结束会话',
                             color: AppColors.error,
-                            onTap: controller.endSession,
+                            onTap: () async {
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                builder: (dialogContext) => AlertDialog(
+                                  title: const Text('确认结束当前会话？'),
+                                  content: const Text('会话将标记为中止并进入完成页。'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(
+                                        dialogContext,
+                                        false,
+                                      ),
+                                      child: const Text('取消'),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () => Navigator.pop(
+                                        dialogContext,
+                                        true,
+                                      ),
+                                      child: const Text('确认结束'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirmed ?? false) {
+                                controller.endSession();
+                              }
+                            },
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -166,10 +235,8 @@ class OperatorPanel extends StatelessWidget {
                       children: [
                         Expanded(
                           child: _SmallButton(
-                            label: '导出日志',
-                            onTap: () => engine.handleEvent(
-                              const OperatorAction(OperatorActionType.exportLog),
-                            ),
+                            label: '查看日志',
+                            onTap: () => controller.viewLog(),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -177,12 +244,45 @@ class OperatorPanel extends StatelessWidget {
                           child: _SmallButton(
                             label: '清空数据',
                             color: AppColors.error,
-                            onTap: () => engine.handleEvent(
-                              const OperatorAction(OperatorActionType.clearData),
-                            ),
+                            onTap: () async {
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                builder: (dialogContext) => AlertDialog(
+                                  title: const Text('确认清空测试数据？'),
+                                  content: const Text('此操作不可撤销。'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(
+                                        dialogContext,
+                                        false,
+                                      ),
+                                      child: const Text('取消'),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () => Navigator.pop(
+                                        dialogContext,
+                                        true,
+                                      ),
+                                      child: const Text('确认清空'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirmed ?? false) {
+                                await controller.clearData();
+                              }
+                            },
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: _SmallButton(
+                        label: '导出全部日志',
+                        onTap: () => controller.exportLog(),
+                      ),
                     ),
                     const SizedBox(height: 8),
                   ],
@@ -272,8 +372,7 @@ class _SmallButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.circular(8),

@@ -54,7 +54,8 @@ class AudioControls extends StatelessWidget {
               const SizedBox(width: 24),
               // Play / Pause
               _ControlButton(
-                icon: isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                icon:
+                    isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                 size: 52,
                 onTap: isPlaying ? onPause : onResume,
               ),

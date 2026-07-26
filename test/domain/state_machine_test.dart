@@ -13,7 +13,7 @@ void main() {
       expect(ExperienceState.values.length, 21);
     });
 
-  test('all states have id', () {
+    test('all states have id', () {
       for (final state in ExperienceState.values) {
         expect(state.id, isNotEmpty);
       }
@@ -78,9 +78,12 @@ void main() {
 
     test('UserActionType.fromApiName works', () {
       expect(UserActionType.fromApiName('continue'), UserActionType.continue_);
-      expect(UserActionType.fromApiName('start_test'), UserActionType.startTest);
-      expect(UserActionType.fromApiName('choose_feudal'), UserActionType.chooseFeudal);
-      expect(UserActionType.fromApiName('submit_survey'), UserActionType.submitSurvey);
+      expect(
+          UserActionType.fromApiName('start_test'), UserActionType.startTest);
+      expect(UserActionType.fromApiName('choose_feudal'),
+          UserActionType.chooseFeudal);
+      expect(UserActionType.fromApiName('submit_survey'),
+          UserActionType.submitSurvey);
     });
 
     test('UserActionType.apiName roundtrip', () {
@@ -109,58 +112,133 @@ void main() {
     });
 
     test('READY → INTRO on startTest', () {
-      final next = route.nextState(ExperienceState.ready, ExperienceEventType.userStartTest);
+      final next = route.nextState(
+          ExperienceState.ready, ExperienceEventType.userStartTest);
       expect(next, ExperienceState.intro);
     });
 
     test('walkToWumen: arrived progresses, audioCompleted does not', () {
-      final arrived = route.nextState(ExperienceState.walkToWumen, ExperienceEventType.userArrived);
+      final arrived = route.nextState(
+          ExperienceState.walkToWumen, ExperienceEventType.userArrived);
       expect(arrived, ExperienceState.wumenNorth);
 
-      final audioEnd = route.nextState(ExperienceState.walkToWumen, ExperienceEventType.audioCompleted);
+      final audioEnd = route.nextState(
+          ExperienceState.walkToWumen, ExperienceEventType.audioCompleted);
       expect(audioEnd, isNull);
     });
 
     test('follows full normal route end-to-end', () {
       final expectedSequence = [
-        (ExperienceState.ready, ExperienceEventType.userStartTest, ExperienceState.intro),
-        (ExperienceState.intro, ExperienceEventType.userStartTest, ExperienceState.fengtianNorth),
-        (ExperienceState.fengtianNorth, ExperienceEventType.userContinue, ExperienceState.walkToWumen),
-        (ExperienceState.walkToWumen, ExperienceEventType.userArrived, ExperienceState.wumenNorth),
-        (ExperienceState.wumenNorth, ExperienceEventType.userContinue, ExperienceState.waitForRouteDecision),
-        (ExperienceState.waitForRouteDecision, ExperienceEventType.operatorSelectNormal, ExperienceState.normalAscend),
-        (ExperienceState.normalAscend, ExperienceEventType.userArrived, ExperienceState.normalPlatformObserve),
-        (ExperienceState.normalPlatformObserve, ExperienceEventType.userContinue, ExperienceState.normalPlatformNarration),
-        (ExperienceState.normalPlatformNarration, ExperienceEventType.audioCompleted, ExperienceState.question),
-        (ExperienceState.question, ExperienceEventType.userChooseFeudal, ExperienceState.questionBranchFeudal),
-        (ExperienceState.questionBranchFeudal, ExperienceEventType.audioCompleted, ExperienceState.questionMerge),
-        (ExperienceState.questionMerge, ExperienceEventType.userContinue, ExperienceState.normalDescend),
-        (ExperienceState.normalDescend, ExperienceEventType.userArrived, ExperienceState.walkThroughWumen),
-        (ExperienceState.walkThroughWumen, ExperienceEventType.userArrived, ExperienceState.wumenSouthEnding),
-        (ExperienceState.wumenSouthEnding, ExperienceEventType.audioCompleted, ExperienceState.endingAmbience),
-        (ExperienceState.endingAmbience, ExperienceEventType.timerElapsed, ExperienceState.survey),
-        (ExperienceState.survey, ExperienceEventType.userSubmitSurvey, ExperienceState.completed),
+        (
+          ExperienceState.ready,
+          ExperienceEventType.userStartTest,
+          ExperienceState.intro
+        ),
+        (
+          ExperienceState.intro,
+          ExperienceEventType.userStartTest,
+          ExperienceState.fengtianNorth
+        ),
+        (
+          ExperienceState.fengtianNorth,
+          ExperienceEventType.userContinue,
+          ExperienceState.walkToWumen
+        ),
+        (
+          ExperienceState.walkToWumen,
+          ExperienceEventType.userArrived,
+          ExperienceState.wumenNorth
+        ),
+        (
+          ExperienceState.wumenNorth,
+          ExperienceEventType.userContinue,
+          ExperienceState.waitForRouteDecision
+        ),
+        (
+          ExperienceState.waitForRouteDecision,
+          ExperienceEventType.operatorSelectNormal,
+          ExperienceState.normalAscend
+        ),
+        (
+          ExperienceState.normalAscend,
+          ExperienceEventType.userArrived,
+          ExperienceState.normalPlatformObserve
+        ),
+        (
+          ExperienceState.normalPlatformObserve,
+          ExperienceEventType.userContinue,
+          ExperienceState.normalPlatformNarration
+        ),
+        (
+          ExperienceState.normalPlatformNarration,
+          ExperienceEventType.audioCompleted,
+          ExperienceState.question
+        ),
+        (
+          ExperienceState.question,
+          ExperienceEventType.userChooseFeudal,
+          ExperienceState.questionBranchFeudal
+        ),
+        (
+          ExperienceState.questionBranchFeudal,
+          ExperienceEventType.audioCompleted,
+          ExperienceState.questionMerge
+        ),
+        (
+          ExperienceState.questionMerge,
+          ExperienceEventType.userContinue,
+          ExperienceState.normalDescend
+        ),
+        (
+          ExperienceState.normalDescend,
+          ExperienceEventType.userArrived,
+          ExperienceState.walkThroughWumen
+        ),
+        (
+          ExperienceState.walkThroughWumen,
+          ExperienceEventType.userArrived,
+          ExperienceState.wumenSouthEnding
+        ),
+        (
+          ExperienceState.wumenSouthEnding,
+          ExperienceEventType.audioCompleted,
+          ExperienceState.endingAmbience
+        ),
+        (
+          ExperienceState.endingAmbience,
+          ExperienceEventType.timerElapsed,
+          ExperienceState.survey
+        ),
+        (
+          ExperienceState.survey,
+          ExperienceEventType.userSubmitSurvey,
+          ExperienceState.completed
+        ),
       ];
 
       for (final (from, event, expected) in expectedSequence) {
         final next = route.nextState(from, event);
-        expect(next, expected, reason: 'Transition $from → $event should give $expected');
+        expect(next, expected,
+            reason: 'Transition $from → $event should give $expected');
       }
     });
 
     test('normal: restart from completed goes to ready', () {
-      final next = route.nextState(ExperienceState.completed, ExperienceEventType.userRestart);
+      final next = route.nextState(
+          ExperienceState.completed, ExperienceEventType.userRestart);
       expect(next, ExperienceState.ready);
     });
 
     test('invalid transition returns null', () {
-      final next = route.nextState(ExperienceState.ready, ExperienceEventType.audioCompleted);
+      final next = route.nextState(
+          ExperienceState.ready, ExperienceEventType.audioCompleted);
       expect(next, isNull);
     });
 
     test('non-existent state returns null', () {
       // There is no transition table entry for non-terminal states.
-      final next = route.nextState(ExperienceState.questionBranchFeudal, ExperienceEventType.userChooseFeudal);
+      final next = route.nextState(ExperienceState.questionBranchFeudal,
+          ExperienceEventType.userChooseFeudal);
       expect(next, isNull);
     });
   });
@@ -174,7 +252,8 @@ void main() {
     );
 
     test('shares normal route until waitForRouteDecision', () {
-      final next = route.nextState(ExperienceState.walkToWumen, ExperienceEventType.userArrived);
+      final next = route.nextState(
+          ExperienceState.walkToWumen, ExperienceEventType.userArrived);
       expect(next, ExperienceState.wumenNorth);
     });
 
@@ -193,34 +272,93 @@ void main() {
     });
 
     test('fallback has no normal ascend/descend/platform states', () {
-      final ascend = route.nextState(ExperienceState.normalAscend, ExperienceEventType.userArrived);
+      final ascend = route.nextState(
+          ExperienceState.normalAscend, ExperienceEventType.userArrived);
       expect(ascend, isNull);
 
-      final observe = route.nextState(ExperienceState.normalPlatformObserve, ExperienceEventType.userContinue);
+      final observe = route.nextState(ExperienceState.normalPlatformObserve,
+          ExperienceEventType.userContinue);
       expect(observe, isNull);
     });
 
     test('follows full fallback route end-to-end', () {
       final expectedSequence = [
-        (ExperienceState.ready, ExperienceEventType.userStartTest, ExperienceState.intro),
-        (ExperienceState.intro, ExperienceEventType.userStartTest, ExperienceState.fengtianNorth),
-        (ExperienceState.fengtianNorth, ExperienceEventType.userContinue, ExperienceState.walkToWumen),
-        (ExperienceState.walkToWumen, ExperienceEventType.userArrived, ExperienceState.wumenNorth),
-        (ExperienceState.wumenNorth, ExperienceEventType.userContinue, ExperienceState.waitForRouteDecision),
-        (ExperienceState.waitForRouteDecision, ExperienceEventType.operatorSelectFallback, ExperienceState.fallbackGroundObserve),
-        (ExperienceState.fallbackGroundObserve, ExperienceEventType.userContinue, ExperienceState.fallbackGroundNarration),
-        (ExperienceState.fallbackGroundNarration, ExperienceEventType.audioCompleted, ExperienceState.question),
-        (ExperienceState.question, ExperienceEventType.userChooseClassics, ExperienceState.questionBranchClassics),
-        (ExperienceState.questionBranchClassics, ExperienceEventType.audioCompleted, ExperienceState.questionMerge),
-        (ExperienceState.questionMerge, ExperienceEventType.userContinue, ExperienceState.wumenSouthEnding),
-        (ExperienceState.wumenSouthEnding, ExperienceEventType.userContinue, ExperienceState.endingAmbience),
-        (ExperienceState.endingAmbience, ExperienceEventType.timerElapsed, ExperienceState.survey),
-        (ExperienceState.survey, ExperienceEventType.userSubmitSurvey, ExperienceState.completed),
+        (
+          ExperienceState.ready,
+          ExperienceEventType.userStartTest,
+          ExperienceState.intro
+        ),
+        (
+          ExperienceState.intro,
+          ExperienceEventType.userStartTest,
+          ExperienceState.fengtianNorth
+        ),
+        (
+          ExperienceState.fengtianNorth,
+          ExperienceEventType.userContinue,
+          ExperienceState.walkToWumen
+        ),
+        (
+          ExperienceState.walkToWumen,
+          ExperienceEventType.userArrived,
+          ExperienceState.wumenNorth
+        ),
+        (
+          ExperienceState.wumenNorth,
+          ExperienceEventType.userContinue,
+          ExperienceState.waitForRouteDecision
+        ),
+        (
+          ExperienceState.waitForRouteDecision,
+          ExperienceEventType.operatorSelectFallback,
+          ExperienceState.fallbackGroundObserve
+        ),
+        (
+          ExperienceState.fallbackGroundObserve,
+          ExperienceEventType.userContinue,
+          ExperienceState.fallbackGroundNarration
+        ),
+        (
+          ExperienceState.fallbackGroundNarration,
+          ExperienceEventType.audioCompleted,
+          ExperienceState.question
+        ),
+        (
+          ExperienceState.question,
+          ExperienceEventType.userChooseClassics,
+          ExperienceState.questionBranchClassics
+        ),
+        (
+          ExperienceState.questionBranchClassics,
+          ExperienceEventType.audioCompleted,
+          ExperienceState.questionMerge
+        ),
+        (
+          ExperienceState.questionMerge,
+          ExperienceEventType.userContinue,
+          ExperienceState.wumenSouthEnding
+        ),
+        (
+          ExperienceState.wumenSouthEnding,
+          ExperienceEventType.userContinue,
+          ExperienceState.endingAmbience
+        ),
+        (
+          ExperienceState.endingAmbience,
+          ExperienceEventType.timerElapsed,
+          ExperienceState.survey
+        ),
+        (
+          ExperienceState.survey,
+          ExperienceEventType.userSubmitSurvey,
+          ExperienceState.completed
+        ),
       ];
 
       for (final (from, event, expected) in expectedSequence) {
         final next = route.nextState(from, event);
-        expect(next, expected, reason: 'Transition $from → $event should give $expected');
+        expect(next, expected,
+            reason: 'Transition $from → $event should give $expected');
       }
     });
 
@@ -255,7 +393,11 @@ void main() {
         'autoAdvance': false,
         'visualSequence': [
           {'asset': 'images/test/layer1.webp', 'startMs': 0, 'fadeInMs': 1200},
-          {'asset': 'images/test/layer2.webp', 'startMs': 1500, 'fadeInMs': 800},
+          {
+            'asset': 'images/test/layer2.webp',
+            'startMs': 1500,
+            'fadeInMs': 800
+          },
         ],
         'allowedActions': ['continue', 'pause'],
         'safetyMode': 'stationary',
@@ -496,7 +638,8 @@ void main() {
     });
 
     test('toJson roundtrip', () {
-      final layer = VisualLayer(asset: 'test.webp', startMs: 500, fadeInMs: 200);
+      final layer =
+          VisualLayer(asset: 'test.webp', startMs: 500, fadeInMs: 200);
       final json = layer.toJson();
       final parsed = VisualLayer.fromJson(json);
 

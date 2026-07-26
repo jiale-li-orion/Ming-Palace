@@ -73,8 +73,19 @@ class FakeSessionRepository implements SessionRepository {
   }
 
   @override
-  Future<Result<void, AppError>> saveState(ExperienceState state, int position) async {
-    _savedState = {'state': state.id, 'audioPositionMs': position};
+  Future<Result<void, AppError>> saveState(
+    ExperienceState state,
+    int position, {
+    String routeId = 'normal',
+    String? audioAsset,
+  }) async {
+    _savedState = {
+      'sessionId': _sessionId,
+      'state': state.id,
+      'route': routeId,
+      'audioAsset': audioAsset,
+      'audioPositionMs': position,
+    };
     return Ok(null);
   }
 
@@ -94,17 +105,26 @@ Map<String, SceneDefinition> _defaultScenes() {
   for (final state in ExperienceState.values) {
     scenes[state.id] = SceneDefinition(
       id: state.id,
-      renderer: state == ExperienceState.question ? 'question' :
-                state.isSafetyState ? 'safety' :
-                state == ExperienceState.survey ? 'survey' :
-                state == ExperienceState.completed ? 'completed' :
-                state == ExperienceState.ready ? 'instruction' :
-                state == ExperienceState.waitForRouteDecision ? 'instruction' :
-                'narrative',
+      renderer: state == ExperienceState.question
+          ? 'question'
+          : state.isSafetyState
+              ? 'safety'
+              : state == ExperienceState.survey
+                  ? 'survey'
+                  : state == ExperienceState.completed
+                      ? 'completed'
+                      : state == ExperienceState.ready
+                          ? 'instruction'
+                          : state == ExperienceState.waitForRouteDecision
+                              ? 'instruction'
+                              : 'narrative',
       minimumDurationMs: 1000,
       autoAdvance: state == ExperienceState.endingAmbience,
       visualSequence: [],
       allowedActions: _allowedActions(state),
+      next: state == ExperienceState.intro
+          ? [ExperienceState.fengtianNorth.id]
+          : const [],
       safetyMode: state.isSafetyState ? 'ascending' : 'stationary',
     );
   }
@@ -163,6 +183,7 @@ ExperienceEngine _createEngine({Map<String, SceneDefinition>? scenes}) {
     contentRepository: FakeContentRepository(scenes ?? _defaultScenes()),
     telemetryRepository: FakeTelemetryRepository(),
     sessionRepository: FakeSessionRepository(),
+    enforceMinimumDuration: false,
   );
 }
 
@@ -181,6 +202,7 @@ void main() {
         contentRepository: FailingContentRepository(),
         telemetryRepository: FakeTelemetryRepository(),
         sessionRepository: FakeSessionRepository(),
+        enforceMinimumDuration: false,
       );
       final result = await engine.initialize();
       expect(result.isErr, isTrue);
@@ -212,56 +234,57 @@ void main() {
       void tap(UserActionType action) => engine.handleEvent(UserAction(action));
 
       // Step through the entire normal route
-      tap(UserActionType.startTest);  // ready → intro
+      tap(UserActionType.startTest); // ready → intro
       expect(engine.currentState, ExperienceState.intro);
 
-      tap(UserActionType.startTest);  // intro → fengtianNorth
+      tap(UserActionType.startTest); // intro → fengtianNorth
       expect(engine.currentState, ExperienceState.fengtianNorth);
 
-      engine.handleEvent(AudioCompleted());  // fengtianNorth → walkToWumen
+      engine.handleEvent(AudioCompleted()); // fengtianNorth → walkToWumen
       expect(engine.currentState, ExperienceState.walkToWumen);
 
-      tap(UserActionType.arrived);  // walkToWumen → wumenNorth
+      tap(UserActionType.arrived); // walkToWumen → wumenNorth
       expect(engine.currentState, ExperienceState.wumenNorth);
 
-      tap(UserActionType.continue_);  // wumenNorth → waitForRouteDecision
+      tap(UserActionType.continue_); // wumenNorth → waitForRouteDecision
       expect(engine.currentState, ExperienceState.waitForRouteDecision);
 
-      engine.handleEvent(OperatorAction(OperatorActionType.switchToNormal));  // → normalAscend
+      engine.handleEvent(
+          OperatorAction(OperatorActionType.switchToNormal)); // → normalAscend
       expect(engine.currentState, ExperienceState.normalAscend);
 
-      tap(UserActionType.arrived);  // normalAscend → normalPlatformObserve
+      tap(UserActionType.arrived); // normalAscend → normalPlatformObserve
       expect(engine.currentState, ExperienceState.normalPlatformObserve);
 
-      tap(UserActionType.continue_);  // → normalPlatformNarration
+      tap(UserActionType.continue_); // → normalPlatformNarration
       expect(engine.currentState, ExperienceState.normalPlatformNarration);
 
-      engine.handleEvent(AudioCompleted());  // → question
+      engine.handleEvent(AudioCompleted()); // → question
       expect(engine.currentState, ExperienceState.question);
 
-      tap(UserActionType.chooseFeudal);  // → questionBranchFeudal
+      tap(UserActionType.chooseFeudal); // → questionBranchFeudal
       expect(engine.currentState, ExperienceState.questionBranchFeudal);
       expect(engine.questionChoice, 'feudal');
 
-      engine.handleEvent(AudioCompleted());  // → questionMerge
+      engine.handleEvent(AudioCompleted()); // → questionMerge
       expect(engine.currentState, ExperienceState.questionMerge);
 
-      tap(UserActionType.continue_);  // → normalDescend
+      tap(UserActionType.continue_); // → normalDescend
       expect(engine.currentState, ExperienceState.normalDescend);
 
-      tap(UserActionType.arrived);  // → walkThroughWumen
+      tap(UserActionType.arrived); // → walkThroughWumen
       expect(engine.currentState, ExperienceState.walkThroughWumen);
 
-      tap(UserActionType.arrived);  // → wumenSouthEnding
+      tap(UserActionType.arrived); // → wumenSouthEnding
       expect(engine.currentState, ExperienceState.wumenSouthEnding);
 
-      engine.handleEvent(AudioCompleted());  // → endingAmbience
+      engine.handleEvent(AudioCompleted()); // → endingAmbience
       expect(engine.currentState, ExperienceState.endingAmbience);
 
-      engine.handleEvent(TimerElapsed());  // → survey
+      engine.handleEvent(TimerElapsed()); // → survey
       expect(engine.currentState, ExperienceState.survey);
 
-      tap(UserActionType.submitSurvey);  // → completed
+      tap(UserActionType.submitSurvey); // → completed
       expect(engine.currentState, ExperienceState.completed);
       expect(engine.currentState.isTerminalState, isTrue);
     });
@@ -322,7 +345,7 @@ void main() {
       expect(vm!.state, ExperienceState.intro);
     });
 
-    test('sceneViewModel returns null for unknown state', () {
+    test('sceneViewModel returns null when current scene is absent', () async {
       // If scene data is missing a state, vm should be null
       final incompleteScenes = <String, SceneDefinition>{
         'ready': SceneDefinition(
@@ -336,8 +359,41 @@ void main() {
         ),
       };
       final engine = _createEngine(scenes: incompleteScenes);
-      // Engine loads, but only 'ready' scene is available
-      // We can't actually test this without making the engine async
+      await engine.initialize();
+      expect(engine.sceneViewModel, isNull);
+    });
+
+    test('observation state rejects continue before minimum duration',
+        () async {
+      final telemetry = FakeTelemetryRepository();
+      final scenes = _defaultScenes();
+      scenes[ExperienceState.normalPlatformObserve.id] = const SceneDefinition(
+        id: 'NORMAL_PLATFORM_OBSERVE',
+        renderer: 'layered_reconstruction',
+        minimumDurationMs: 10000,
+        autoAdvance: false,
+        visualSequence: [],
+        allowedActions: ['continue'],
+        safetyMode: 'stationary',
+      );
+      final engine = ExperienceEngine(
+        contentRepository: FakeContentRepository(scenes),
+        telemetryRepository: telemetry,
+        sessionRepository: FakeSessionRepository(),
+      );
+      await engine.initialize();
+      await engine.startSession();
+      engine.operatorJump(ExperienceState.normalPlatformObserve);
+
+      engine.handleEvent(UserAction(UserActionType.continue_));
+
+      expect(engine.currentState, ExperienceState.normalPlatformObserve);
+      expect(
+        telemetry.events.any(
+          (event) => event['event'] == 'user_action_rejected',
+        ),
+        isTrue,
+      );
     });
 
     test('restart from completed goes to ready', () {
@@ -390,7 +446,7 @@ void main() {
       engine.handleEvent(OperatorAction(OperatorActionType.switchToFallback));
       expect(engine.currentState, ExperienceState.fallbackGroundObserve);
 
-      tap(UserActionType.continue_);  // → fallbackGroundNarration
+      tap(UserActionType.continue_); // → fallbackGroundNarration
       expect(engine.currentState, ExperienceState.fallbackGroundNarration);
     });
   });
@@ -415,6 +471,10 @@ void main() {
       final engine = _createEngine();
       await engine.initialize();
 
+      expect(engine.setRoute('fallback'), isFalse);
+      expect(engine.currentRoute.id, 'normal');
+
+      engine.operatorJump(ExperienceState.waitForRouteDecision);
       engine.setRoute('fallback');
       expect(engine.currentRoute.id, 'fallback');
       expect(engine.currentRoute.isFallback, isTrue);
@@ -423,6 +483,30 @@ void main() {
       expect(engine.currentRoute.id, 'normal');
       expect(engine.currentRoute.isFallback, isFalse);
     });
+
+    test('operator next previous and help actions have real effects', () async {
+      final telemetry = FakeTelemetryRepository();
+      final engine = ExperienceEngine(
+        contentRepository: FakeContentRepository(_defaultScenes()),
+        telemetryRepository: telemetry,
+        sessionRepository: FakeSessionRepository(),
+        enforceMinimumDuration: false,
+      );
+      await engine.initialize();
+      await engine.startSession();
+      engine.handleEvent(const UserAction(UserActionType.startTest));
+
+      engine.operatorNext();
+      expect(engine.currentState, ExperienceState.fengtianNorth);
+      engine.operatorPrevious();
+      expect(engine.currentState, ExperienceState.intro);
+      engine.markNeedsHelp();
+
+      expect(
+        telemetry.events.where((event) => event['event'] == 'help_requested'),
+        hasLength(1),
+      );
+    });
   });
 
   group('App resume', () {
@@ -430,8 +514,26 @@ void main() {
       final engine = _createEngine();
       await engine.initialize();
 
-      engine.handleEvent(AppResumed(ExperienceState.normalPlatformObserve, 30000));
+      engine.handleEvent(
+          AppResumed(ExperienceState.normalPlatformObserve, 30000));
       expect(engine.currentState, ExperienceState.normalPlatformObserve);
+    });
+
+    test('restores session identity route and state from snapshot', () async {
+      final engine = _createEngine();
+      await engine.initialize();
+
+      await engine.resumeSavedState({
+        'sessionId': 'saved-session',
+        'state': 'FALLBACK_GROUND_NARRATION',
+        'route': 'fallback',
+        'audioAsset': 'audio/09_ground_fallback.mp3',
+        'audioPositionMs': 1200,
+      });
+
+      expect(engine.sessionId, 'saved-session');
+      expect(engine.currentRoute.id, 'fallback');
+      expect(engine.currentState, ExperienceState.fallbackGroundNarration);
     });
   });
 
@@ -442,6 +544,7 @@ void main() {
         contentRepository: FakeContentRepository(_defaultScenes()),
         telemetryRepository: telemetry,
         sessionRepository: FakeSessionRepository(),
+        enforceMinimumDuration: false,
       );
       await engine.initialize();
       await engine.startSession();
@@ -452,7 +555,7 @@ void main() {
       final transitionEvent = telemetry.events.firstWhere(
         (e) => e['event'] == 'state_transition',
       );
-      expect(transitionEvent['toState'], 'intro');
+      expect(transitionEvent['toState'], 'INTRO');
     });
 
     test('invalid transition is logged', () {
@@ -468,6 +571,7 @@ void main() {
         contentRepository: FakeContentRepository(_defaultScenes()),
         telemetryRepository: telemetry,
         sessionRepository: FakeSessionRepository(),
+        enforceMinimumDuration: false,
       );
       await engine.initialize();
       await engine.startSession();

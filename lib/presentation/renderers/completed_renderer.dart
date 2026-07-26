@@ -53,7 +53,8 @@ class CompletedRenderer implements SceneRenderer {
             const SizedBox(height: 32),
 
             // Session summary
-            if (sessionId != null) _SummaryRow(label: '会话', value: _shortId(sessionId!)),
+            if (sessionId != null)
+              _SummaryRow(label: '会话', value: _shortId(sessionId!)),
             if (routeName != null) _SummaryRow(label: '路线', value: routeName!),
             if (questionChoice != null)
               _SummaryRow(

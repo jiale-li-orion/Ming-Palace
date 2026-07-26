@@ -98,10 +98,9 @@ class SceneDefinition {
               .toList() ??
           [],
       allowedActions: allowedActions,
-      next: (json['next'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [],
+      next:
+          (json['next'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              [],
       operatorActions: (json['operatorActions'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??

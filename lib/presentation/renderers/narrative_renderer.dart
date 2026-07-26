@@ -36,14 +36,13 @@ class NarrativeRenderer implements SceneRenderer {
 
   @override
   Widget build(BuildContext context, SceneViewModel viewModel) {
-    final theme = Theme.of(context);
     final rawBg = viewModel.scene.background;
     final bgPath = rawBg != null ? 'assets/$rawBg' : null;
     final hasAudio = viewModel.activeAudioAsset != null;
-    final showArrived = viewModel.isWalking &&
-        viewModel.allowedActions.contains('arrived');
-    final showContinue = !viewModel.isWalking &&
-        viewModel.allowedActions.contains('continue');
+    final showArrived =
+        viewModel.isWalking && viewModel.allowedActions.contains('arrived');
+    final showContinue =
+        !viewModel.isWalking && viewModel.allowedActions.contains('continue');
 
     return Stack(
       fit: StackFit.expand,
@@ -53,7 +52,8 @@ class NarrativeRenderer implements SceneRenderer {
           Image.asset(
             bgPath,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(color: AppColors.background),
+            errorBuilder: (_, __, ___) =>
+                Container(color: AppColors.background),
           )
         else
           Container(color: AppColors.background),
@@ -73,7 +73,9 @@ class NarrativeRenderer implements SceneRenderer {
               // Location hint for walking
               if (viewModel.isWalking)
                 _LocationHint(
-                  text: viewModel.state.isWalkingState ? _stateHint(viewModel) : '',
+                  text: viewModel.state.isWalkingState
+                      ? _stateHint(viewModel)
+                      : '',
                 ),
 
               // Audio controls
@@ -168,7 +170,8 @@ class _AudioStatusBar extends StatelessWidget {
             height: 8,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: isPlaying ? AppColors.primaryLight : AppColors.textDisabled,
+              color:
+                  isPlaying ? AppColors.primaryLight : AppColors.textDisabled,
             ),
           ),
           const SizedBox(width: 8),

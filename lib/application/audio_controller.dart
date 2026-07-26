@@ -75,10 +75,10 @@ class AudioController {
   /// - `"assets/audio/…"`  — used as-is
   /// - `"audio/…"`         — prepends `assets/`
   /// - anything else       — prepends `assets/audio/`
-  Future<void> play(String assetPath) async {
+  Future<void> play(String assetPath, {bool autoplay = true}) async {
     final resolved = _resolveAssetPath(assetPath);
     await _player.setAsset(resolved);
-    await _player.play();
+    if (autoplay) await _player.play();
   }
 
   /// Pauses playback and fires [onPauseCallback] if set.

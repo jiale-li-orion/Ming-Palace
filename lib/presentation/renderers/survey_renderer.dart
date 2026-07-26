@@ -106,17 +106,21 @@ class _SurveyFormState extends State<_SurveyForm> {
             // Q4: Yes/No toggle
             _QuestionLabel(number: 4, text: '是否愿意体验30-45分钟完整版？'),
             const SizedBox(height: 10),
-            _YesNoToggle(value: _q4Answer, onChanged: (v) {
-              setState(() => _q4Answer = v);
-            }),
+            _YesNoToggle(
+                value: _q4Answer,
+                onChanged: (v) {
+                  setState(() => _q4Answer = v);
+                }),
             const SizedBox(height: 24),
 
             // Q5: Yes/No toggle
             _QuestionLabel(number: 5, text: '是否愿意参加下一轮测试？'),
             const SizedBox(height: 10),
-            _YesNoToggle(value: _q5Answer, onChanged: (v) {
-              setState(() => _q5Answer = v);
-            }),
+            _YesNoToggle(
+                value: _q5Answer,
+                onChanged: (v) {
+                  setState(() => _q5Answer = v);
+                }),
             const SizedBox(height: 40),
 
             // Submit
@@ -210,7 +214,6 @@ class _YesNoToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Row(
       children: [
         Expanded(

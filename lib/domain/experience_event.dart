@@ -59,17 +59,28 @@ enum UserActionType {
 
   String get apiName {
     switch (this) {
-      case UserActionType.startTest: return 'start_test';
-      case UserActionType.continue_: return 'continue';
-      case UserActionType.pause: return 'pause';
-      case UserActionType.resume: return 'resume';
-      case UserActionType.replay: return 'replay';
-      case UserActionType.arrived: return 'arrived';
-      case UserActionType.chooseFeudal: return 'choose_feudal';
-      case UserActionType.chooseClassics: return 'choose_classics';
-      case UserActionType.submitSurvey: return 'submit_survey';
-      case UserActionType.export_: return 'export';
-      case UserActionType.restart: return 'restart';
+      case UserActionType.startTest:
+        return 'start_test';
+      case UserActionType.continue_:
+        return 'continue';
+      case UserActionType.pause:
+        return 'pause';
+      case UserActionType.resume:
+        return 'resume';
+      case UserActionType.replay:
+        return 'replay';
+      case UserActionType.arrived:
+        return 'arrived';
+      case UserActionType.chooseFeudal:
+        return 'choose_feudal';
+      case UserActionType.chooseClassics:
+        return 'choose_classics';
+      case UserActionType.submitSurvey:
+        return 'submit_survey';
+      case UserActionType.export_:
+        return 'export';
+      case UserActionType.restart:
+        return 'restart';
     }
   }
 
@@ -96,17 +107,28 @@ enum OperatorActionType {
 
   String get apiName {
     switch (this) {
-      case OperatorActionType.createSession: return 'create_session';
-      case OperatorActionType.previousStep: return 'previous_step';
-      case OperatorActionType.nextStep: return 'next_step';
-      case OperatorActionType.replayAudio: return 'replay_audio';
-      case OperatorActionType.markNeedsHelp: return 'mark_help';
-      case OperatorActionType.switchToNormal: return 'switch_normal';
-      case OperatorActionType.switchToFallback: return 'switch_fallback';
-      case OperatorActionType.endSession: return 'end_session';
-      case OperatorActionType.viewLog: return 'view_log';
-      case OperatorActionType.exportLog: return 'export_log';
-      case OperatorActionType.clearData: return 'clear_data';
+      case OperatorActionType.createSession:
+        return 'create_session';
+      case OperatorActionType.previousStep:
+        return 'previous_step';
+      case OperatorActionType.nextStep:
+        return 'next_step';
+      case OperatorActionType.replayAudio:
+        return 'replay_audio';
+      case OperatorActionType.markNeedsHelp:
+        return 'mark_help';
+      case OperatorActionType.switchToNormal:
+        return 'switch_normal';
+      case OperatorActionType.switchToFallback:
+        return 'switch_fallback';
+      case OperatorActionType.endSession:
+        return 'end_session';
+      case OperatorActionType.viewLog:
+        return 'view_log';
+      case OperatorActionType.exportLog:
+        return 'export_log';
+      case OperatorActionType.clearData:
+        return 'clear_data';
     }
   }
 }

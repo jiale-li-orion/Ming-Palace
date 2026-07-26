@@ -58,8 +58,8 @@ class LocalTelemetryRepository implements TelemetryRepository {
       final enriched = <String, dynamic>{
         'schemaVersion': event['schemaVersion'] ?? 1,
         'sessionId': event['sessionId'],
-        'timestamp': event['timestamp'] ??
-            DateTime.now().toUtc().toIso8601String(),
+        'timestamp':
+            event['timestamp'] ?? DateTime.now().toUtc().toIso8601String(),
         'event': event['event'],
         'state': event['state'],
         'payload': payload,
@@ -86,10 +86,8 @@ class LocalTelemetryRepository implements TelemetryRepository {
         return Err(AppError.telemetryWriteFailed);
       }
 
-      final startedAt =
-          _parseDateTime(events.first['timestamp'] as String?);
-      final endedAt =
-          _parseDateTime(events.last['timestamp'] as String?);
+      final startedAt = _parseDateTime(events.first['timestamp'] as String?);
+      final endedAt = _parseDateTime(events.last['timestamp'] as String?);
 
       String route = 'normal';
       int helpCount = 0;
@@ -207,12 +205,10 @@ class LocalTelemetryRepository implements TelemetryRepository {
   SurveyAnswers? _parseSurvey(Map<String, dynamic>? payload) {
     if (payload == null) return null;
     return SurveyAnswers(
-      experienceDescription:
-          payload['experienceDescription'] as String? ?? '',
+      experienceDescription: payload['experienceDescription'] as String? ?? '',
       mostEngagingMoment: payload['mostEngagingMoment'] as String? ?? '',
       confusingMoment: payload['confusingMoment'] as String? ?? '',
-      wantsLongerExperience:
-          payload['wantsLongerExperience'] as bool? ?? false,
+      wantsLongerExperience: payload['wantsLongerExperience'] as bool? ?? false,
       wantsNextTest: payload['wantsNextTest'] as bool? ?? false,
     );
   }

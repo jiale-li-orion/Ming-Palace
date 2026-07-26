@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../application/experience_controller.dart';
-import '../../app/theme.dart';
 import '../../domain/experience_event.dart';
 import '../../domain/experience_state.dart';
 import 'scene_renderer.dart';
@@ -20,9 +19,8 @@ class SafetyRenderer implements SceneRenderer {
   Widget build(BuildContext context, SceneViewModel viewModel) {
     final isAscending = viewModel.state == ExperienceState.normalAscend;
     final directionText = isAscending ? '上楼' : '下楼';
-    final icon = isAscending
-        ? Icons.arrow_upward_rounded
-        : Icons.arrow_downward_rounded;
+    final icon =
+        isAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded;
 
     return SafeArea(
       child: Container(

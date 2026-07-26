@@ -4,7 +4,8 @@ import 'experience_state.dart';
 class RouteDefinition {
   final String id;
   final ExperienceState initialState;
-  final Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>> transitions;
+  final Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>>
+      transitions;
 
   const RouteDefinition({
     required this.id,
@@ -13,7 +14,8 @@ class RouteDefinition {
   });
 
   /// Look up the next state for a given event; returns null if invalid.
-  ExperienceState? nextState(ExperienceState current, ExperienceEventType event) {
+  ExperienceState? nextState(
+      ExperienceState current, ExperienceEventType event) {
     final stateTransitions = transitions[current];
     if (stateTransitions == null) return null;
     return stateTransitions[event];
@@ -47,7 +49,8 @@ enum ExperienceEventType {
 }
 
 /// Builds the normal-route transition table.
-Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>> buildNormalTransitions() {
+Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>>
+    buildNormalTransitions() {
   return {
     ExperienceState.ready: {
       ExperienceEventType.userStartTest: ExperienceState.intro,
@@ -69,7 +72,8 @@ Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>> buildNormalTran
     },
     ExperienceState.waitForRouteDecision: {
       ExperienceEventType.operatorSelectNormal: ExperienceState.normalAscend,
-      ExperienceEventType.operatorSelectFallback: ExperienceState.fallbackGroundObserve,
+      ExperienceEventType.operatorSelectFallback:
+          ExperienceState.fallbackGroundObserve,
     },
     ExperienceState.normalAscend: {
       ExperienceEventType.userArrived: ExperienceState.normalPlatformObserve,
@@ -83,8 +87,10 @@ Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>> buildNormalTran
       ExperienceEventType.audioCompleted: ExperienceState.question,
     },
     ExperienceState.question: {
-      ExperienceEventType.userChooseFeudal: ExperienceState.questionBranchFeudal,
-      ExperienceEventType.userChooseClassics: ExperienceState.questionBranchClassics,
+      ExperienceEventType.userChooseFeudal:
+          ExperienceState.questionBranchFeudal,
+      ExperienceEventType.userChooseClassics:
+          ExperienceState.questionBranchClassics,
     },
     ExperienceState.questionBranchFeudal: {
       ExperienceEventType.userContinue: ExperienceState.questionMerge,
@@ -123,19 +129,21 @@ Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>> buildNormalTran
       ExperienceEventType.userSubmitSurvey: ExperienceState.completed,
     },
     ExperienceState.completed: {
-      ExperienceEventType.userExport: null,   // stay on completed
+      ExperienceEventType.userExport: null, // stay on completed
       ExperienceEventType.userRestart: ExperienceState.ready,
     },
   };
 }
 
 /// Builds the fallback-route transition table (shares most states with normal).
-Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>> buildFallbackTransitions() {
+Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>>
+    buildFallbackTransitions() {
   final t = buildNormalTransitions();
 
   // Override: waitForRouteDecision goes directly to fallback ground.
   t[ExperienceState.waitForRouteDecision] = {
-    ExperienceEventType.operatorSelectFallback: ExperienceState.fallbackGroundObserve,
+    ExperienceEventType.operatorSelectFallback:
+        ExperienceState.fallbackGroundObserve,
   };
 
   // Override: remove normal ascend/descend paths from fallback route.

@@ -55,7 +55,8 @@ class SceneViewModel {
           activeAudioAsset == other.activeAudioAsset;
 
   @override
-  int get hashCode => Object.hash(state, scene.id, isWalking, isSafetyMode, activeAudioAsset);
+  int get hashCode =>
+      Object.hash(state, scene.id, isWalking, isSafetyMode, activeAudioAsset);
 }
 
 // ---------------------------------------------------------------------------
@@ -73,11 +74,13 @@ class ExperienceEngine extends ChangeNotifier {
   final ContentRepository contentRepository;
   final TelemetryRepository telemetryRepository;
   final SessionRepository sessionRepository;
+  final bool enforceMinimumDuration;
 
   ExperienceEngine({
     required this.contentRepository,
     required this.telemetryRepository,
     required this.sessionRepository,
+    this.enforceMinimumDuration = true,
   });
 
   // ---- internal state ------------------------------------------------------
@@ -99,6 +102,8 @@ class ExperienceEngine extends ChangeNotifier {
   int _operatorTapCount = 0;
   bool _initialized = false;
   String? _lastError;
+  int _restoredAudioPositionMs = 0;
+  final Stopwatch _stateClock = Stopwatch()..start();
 
   // ---- public getters ------------------------------------------------------
 
@@ -110,6 +115,7 @@ class ExperienceEngine extends ChangeNotifier {
   String? get questionChoice => _questionChoice;
   String? get lastError => _lastError;
   bool get isInitialized => _initialized;
+  int get restoredAudioPositionMs => _restoredAudioPositionMs;
 
   /// Whether the operator panel has been unlocked via 7 taps on the title.
   bool get isOperatorUnlocked => _operatorTapCount >= 7;
@@ -157,6 +163,8 @@ class ExperienceEngine extends ChangeNotifier {
       _questionChoice = null;
       _operatorTapCount = 0;
       _lastError = null;
+      _restoredAudioPositionMs = 0;
+      _stateClock.reset();
       await _persistState(0);
       _logTelemetry({
         'event': 'session_created',
@@ -165,6 +173,56 @@ class ExperienceEngine extends ChangeNotifier {
       notifyListeners();
     }
     return result;
+  }
+
+  /// Returns the unfinished local snapshot, if one exists.
+  Future<Result<Map<String, dynamic>?, AppError>> loadSavedState() =>
+      sessionRepository.loadSavedState();
+
+  /// Restores an unfinished session after explicit user confirmation.
+  Future<void> resumeSavedState(Map<String, dynamic> snapshot) async {
+    final sessionId = snapshot['sessionId'] as String?;
+    final stateId = snapshot['state'] as String?;
+    if (sessionId == null || sessionId.isEmpty || stateId == null) {
+      reportError('上次会话数据不完整，无法恢复');
+      return;
+    }
+    try {
+      _sessionId = sessionId;
+      _currentState = ExperienceState.fromId(stateId);
+      _previousState = _currentState;
+      _currentRoute =
+          snapshot['route'] == 'fallback' ? _fallbackRoute : _normalRoute;
+      _restoredAudioPositionMs = snapshot['audioPositionMs'] as int? ?? 0;
+      _lastError = null;
+      _stateClock.reset();
+      _logTelemetry({
+        'event': 'session_resumed',
+        'sessionId': _sessionId,
+        'payload': {
+          'route': _currentRoute.id,
+          'audioPositionMs': _restoredAudioPositionMs,
+        },
+      });
+      notifyListeners();
+    } on FormatException {
+      reportError('上次会话状态无效，无法恢复');
+    }
+  }
+
+  /// Aborts an unfinished session and creates a clean replacement.
+  Future<Result<String, AppError>> abandonSavedState() async {
+    final saved = await sessionRepository.loadSavedState();
+    final oldSessionId = saved.okValue?['sessionId'] as String?;
+    if (oldSessionId != null && oldSessionId.isNotEmpty) {
+      _logTelemetry({
+        'event': 'session_aborted',
+        'sessionId': oldSessionId,
+        'payload': {'reason': 'user_discarded_saved_session'},
+      });
+    }
+    await sessionRepository.clearSavedState();
+    return startSession();
   }
 
   // ---- event dispatch ------------------------------------------------------
@@ -188,20 +246,49 @@ class ExperienceEngine extends ChangeNotifier {
       _logTelemetry({
         'event': 'unhandled_event_type',
         'sessionId': _sessionId,
-        'state': _currentState.name,
+        'state': _currentState.id,
         'eventRuntimeType': event.runtimeType.toString(),
         'detail': event.toString(),
       });
       return;
     }
 
+    if (event is UserAction) {
+      _logTelemetry({
+        'event': 'user_action',
+        'sessionId': _sessionId,
+        'payload': {'action': event.action.apiName},
+      });
+    }
+
+    final scene = sceneViewModel?.scene;
+    final isObservationAdvance = event is UserAction &&
+        event.action == UserActionType.continue_ &&
+        scene?.renderer == 'layered_reconstruction' &&
+        scene?.audio == null;
+    if (enforceMinimumDuration &&
+        isObservationAdvance &&
+        _stateClock.elapsedMilliseconds < (scene?.minimumDurationMs ?? 0)) {
+      _logTelemetry({
+        'event': 'user_action_rejected',
+        'sessionId': _sessionId,
+        'payload': {
+          'action': event.action.apiName,
+          'reason': 'minimum_duration',
+          'remainingMs':
+              scene!.minimumDurationMs - _stateClock.elapsedMilliseconds,
+        },
+      });
+      return;
+    }
+
     final next = _currentRoute.nextState(_currentState, eventType);
     if (next == null) {
-      _lastError = '无有效转换: ${_currentState.name} -> ${eventType.name}';
+      _lastError = '无有效转换: ${_currentState.id} -> ${eventType.name}';
       _logTelemetry({
         'event': 'invalid_transition',
         'sessionId': _sessionId,
-        'fromState': _currentState.name,
+        'fromState': _currentState.id,
         'eventType': eventType.name,
         'error': _lastError,
       });
@@ -241,8 +328,10 @@ class ExperienceEngine extends ChangeNotifier {
 
   /// Internal state transition with logging and persistence.
   void _transitionTo(ExperienceState next, ExperienceEventType eventType) {
+    final elapsedMs = _stateClock.elapsedMilliseconds;
     _previousState = _currentState;
     _currentState = next;
+    _stateClock.reset();
 
     // Auto-switch route at the decision point.
     if (_previousState == ExperienceState.waitForRouteDecision) {
@@ -258,12 +347,26 @@ class ExperienceEngine extends ChangeNotifier {
     }
 
     _logTelemetry({
+      'event': 'state_exited',
+      'sessionId': _sessionId,
+      'payload': {
+        'state': _previousState.id,
+        'durationMs': elapsedMs,
+        'route': _currentRoute.id,
+      },
+    });
+    _logTelemetry({
       'event': 'state_transition',
       'sessionId': _sessionId,
-      'fromState': _previousState.name,
-      'toState': _currentState.name,
+      'fromState': _previousState.id,
+      'toState': _currentState.id,
       'eventType': eventType.name,
       'route': _currentRoute.id,
+    });
+    _logTelemetry({
+      'event': 'state_entered',
+      'sessionId': _sessionId,
+      'payload': {'state': _currentState.id, 'route': _currentRoute.id},
     });
 
     if (_currentState == ExperienceState.completed) {
@@ -277,7 +380,8 @@ class ExperienceEngine extends ChangeNotifier {
     notifyListeners();
 
     // Async fire-and-forget — persistence must never block the event loop.
-    // TODO(M3): persist actual audio position from AudioController instead of 0
+    // State transitions persist immediately; lifecycle/audio callbacks replace
+    // this zero with the exact playback position when it becomes available.
     unawaited(_persistState(0));
   }
 
@@ -311,15 +415,127 @@ class ExperienceEngine extends ChangeNotifier {
   /// This does NOT change the current state — it only affects future
   /// transition lookups.  Typically called by the operator panel before
   /// the route-decision event is dispatched.
-  void setRoute(String routeId) {
-    if (!_initialized) return;
+  bool setRoute(String routeId) {
+    if (!_initialized ||
+        _currentState != ExperienceState.waitForRouteDecision) {
+      _logTelemetry({
+        'event': 'operator_action_rejected',
+        'sessionId': _sessionId,
+        'payload': {
+          'action': 'switch_route',
+          'requestedRoute': routeId,
+          'reason': 'not_at_route_decision',
+        },
+      });
+      return false;
+    }
     _currentRoute = (routeId == 'fallback') ? _fallbackRoute : _normalRoute;
     _logTelemetry({
       'event': 'route_switched',
       'sessionId': _sessionId,
       'route': routeId,
-      'state': _currentState.name,
+      'state': _currentState.id,
     });
+    notifyListeners();
+    return true;
+  }
+
+  // ---- operator use cases -------------------------------------------------
+
+  void operatorNext() {
+    final candidates = sceneViewModel?.scene.next ?? const <String>[];
+    if (candidates.isEmpty) return;
+    String target = candidates.first;
+    if (_currentState == ExperienceState.waitForRouteDecision) {
+      target = _currentRoute.isFallback
+          ? ExperienceState.fallbackGroundObserve.id
+          : ExperienceState.normalAscend.id;
+    } else if (_currentState == ExperienceState.questionMerge &&
+        _currentRoute.isFallback) {
+      target = ExperienceState.wumenSouthEnding.id;
+    }
+    operatorJump(ExperienceState.fromId(target), action: 'next_step');
+  }
+
+  void operatorPrevious() {
+    if (_previousState == _currentState) return;
+    operatorJump(_previousState, action: 'previous_step');
+  }
+
+  void operatorJump(
+    ExperienceState target, {
+    String action = 'jump_to_state',
+  }) {
+    _logTelemetry({
+      'event': 'operator_action',
+      'sessionId': _sessionId,
+      'payload': {'action': action, 'targetState': target.id},
+    });
+    _transitionTo(target, ExperienceEventType.operatorNextStep);
+  }
+
+  void markNeedsHelp() {
+    _logTelemetry({
+      'event': 'operator_action',
+      'sessionId': _sessionId,
+      'payload': {'action': 'mark_help'},
+    });
+    _logTelemetry({
+      'event': 'help_requested',
+      'sessionId': _sessionId,
+    });
+  }
+
+  void recordOperatorAction(String action) {
+    _logTelemetry({
+      'event': 'operator_action',
+      'sessionId': _sessionId,
+      'payload': {'action': action},
+    });
+  }
+
+  void recordAudioEvent(String event, {Map<String, dynamic>? payload}) {
+    _logTelemetry({
+      'event': event,
+      'sessionId': _sessionId,
+      'payload': payload ?? const <String, dynamic>{},
+    });
+  }
+
+  void recordAppError(String code, {String? detail}) {
+    _logTelemetry({
+      'event': 'app_error',
+      'sessionId': _sessionId,
+      'payload': {
+        'code': code,
+        if (detail != null) 'detail': detail,
+      },
+    });
+  }
+
+  Future<Result<List<Map<String, dynamic>>, AppError>> loadTelemetry() =>
+      telemetryRepository.exportAll();
+
+  Future<void> clearAllData() async {
+    recordOperatorAction('clear_data');
+    await telemetryRepository.clearAll();
+    await sessionRepository.clearSavedState();
+  }
+
+  Future<void> endSession() async {
+    _logTelemetry({
+      'event': 'operator_action',
+      'sessionId': _sessionId,
+      'payload': {'action': 'end_session'},
+    });
+    _logTelemetry({
+      'event': 'session_aborted',
+      'sessionId': _sessionId,
+      'payload': {'reason': 'operator_ended_session'},
+    });
+    _previousState = _currentState;
+    _currentState = ExperienceState.completed;
+    await sessionRepository.clearSavedState();
     notifyListeners();
   }
 
@@ -365,7 +581,7 @@ class ExperienceEngine extends ChangeNotifier {
     _logTelemetry({
       'event': 'app_resumed',
       'sessionId': _sessionId,
-      'state': _currentState.name,
+      'state': _currentState.id,
       'savedAudioPositionMs': event.savedAudioPositionMs,
     });
     notifyListeners();
@@ -378,13 +594,18 @@ class ExperienceEngine extends ChangeNotifier {
   }
 
   Future<void> _persistState(int audioPositionMs) async {
-    await sessionRepository.saveState(_currentState, audioPositionMs);
+    await sessionRepository.saveState(
+      _currentState,
+      audioPositionMs,
+      routeId: _currentRoute.id,
+      audioAsset: sceneViewModel?.activeAudioAsset,
+    );
   }
 
   // ---- telemetry -----------------------------------------------------------
 
   void _logTelemetry(Map<String, dynamic> event) {
-    telemetryRepository.log({...event, 'state': _currentState.name});
+    telemetryRepository.log({...event, 'state': _currentState.id});
   }
 
   // ---- event-type mapping --------------------------------------------------

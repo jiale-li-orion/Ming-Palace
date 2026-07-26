@@ -1,17 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ming_palace/infrastructure/local_content_repository.dart';
 import 'package:ming_palace/infrastructure/export_service.dart';
 import 'package:ming_palace/infrastructure/local_telemetry_repository.dart';
 import 'package:ming_palace/infrastructure/local_session_repository.dart';
 import 'package:ming_palace/domain/experience_state.dart';
-import 'package:ming_palace/domain/session_summary.dart';
-import 'package:ming_palace/shared/app_error.dart';
-import 'package:ming_palace/shared/result.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -19,7 +14,8 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 // Fake PathProvider — avoids needing real device directories in unit tests
 // ---------------------------------------------------------------------------
 
-class FakePathProvider extends PathProviderPlatform with MockPlatformInterfaceMixin {
+class FakePathProvider extends PathProviderPlatform
+    with MockPlatformInterfaceMixin {
   final Directory tempDir;
 
   FakePathProvider(this.tempDir);
@@ -51,13 +47,12 @@ void main() {
   });
 
   group('LocalContentRepository', () {
-    test('returns error when asset file is missing — flutter test cannot load bundle', () {
-      // In pure unit tests without a real Flutter asset bundle, loadString will fail.
-      // This test verifies error handling.
-      final repo = LocalContentRepository();
-      // This will throw a FlutterError because rootBundle isn't available in pure test.
-      // In a real Flutter test using flutter_test, rootBundle works.
-      // For CI, this test demonstrates the contract; the error path is covered by the try/catch.
+    test('loads the bundled, validated 21-scene package', () async {
+      final source =
+          await File('assets/content/experience.json').readAsString();
+      final result = parseExperienceJson(source);
+      expect(result.isOk, isTrue);
+      expect(result.okValue, hasLength(21));
     });
   });
 
@@ -91,8 +86,13 @@ void main() {
       const sessionId = 'summary-test-1';
 
       await repo.log({'event': 'session_created', 'sessionId': sessionId});
-      await repo.log({'event': 'state_entered', 'sessionId': sessionId, 'state': 'INTRO'});
-      await repo.log({'event': 'question_choice', 'sessionId': sessionId, 'payload': {'choice': 'feudal_princes'}});
+      await repo.log(
+          {'event': 'state_entered', 'sessionId': sessionId, 'state': 'INTRO'});
+      await repo.log({
+        'event': 'question_choice',
+        'sessionId': sessionId,
+        'payload': {'choice': 'feudal_princes'}
+      });
       await repo.log({'event': 'session_completed', 'sessionId': sessionId});
 
       final result = await repo.buildSummary(sessionId);
@@ -112,7 +112,11 @@ void main() {
       const sessionId = 'summary-test-2';
 
       await repo.log({'event': 'session_created', 'sessionId': sessionId});
-      await repo.log({'event': 'state_entered', 'sessionId': sessionId, 'state': 'WALK_TO_WUMEN'});
+      await repo.log({
+        'event': 'state_entered',
+        'sessionId': sessionId,
+        'state': 'WALK_TO_WUMEN'
+      });
       await repo.log({'event': 'fallback_route_used', 'sessionId': sessionId});
       await repo.log({'event': 'help_requested', 'sessionId': sessionId});
       await repo.log({'event': 'help_requested', 'sessionId': sessionId});
@@ -131,7 +135,11 @@ void main() {
       const sessionId = 'summary-test-3';
 
       await repo.log({'event': 'session_created', 'sessionId': sessionId});
-      await repo.log({'event': 'state_entered', 'sessionId': sessionId, 'state': 'FENGTIAN_NORTH'});
+      await repo.log({
+        'event': 'state_entered',
+        'sessionId': sessionId,
+        'state': 'FENGTIAN_NORTH'
+      });
       await repo.log({'event': 'session_aborted', 'sessionId': sessionId});
 
       final result = await repo.buildSummary(sessionId);
@@ -189,7 +197,11 @@ void main() {
 
       await repo.log({'event': 'session_created', 'sessionId': 'sess-a'});
       await repo.log({'event': 'session_created', 'sessionId': 'sess-b'});
-      await repo.log({'event': 'question_choice', 'sessionId': 'sess-a', 'payload': {'choice': 'feudal_princes'}});
+      await repo.log({
+        'event': 'question_choice',
+        'sessionId': 'sess-a',
+        'payload': {'choice': 'feudal_princes'}
+      });
 
       final summaryA = await repo.buildSummary('sess-a');
       expect(summaryA.okValue!.questionChoice, 'feudal_princes');
@@ -231,12 +243,22 @@ void main() {
       final repo = LocalSessionRepository();
       await repo.createSession();
 
-      await repo.saveState(ExperienceState.normalPlatformObserve, 12345);
+      await repo.saveState(
+        ExperienceState.normalPlatformObserve,
+        12345,
+        routeId: 'normal',
+        audioAsset: 'audio/04_platform_narration.mp3',
+      );
       final loaded = await repo.loadSavedState();
       expect(loaded.isOk, isTrue);
       expect(loaded.okValue, isNotNull);
       expect(loaded.okValue!['state'], 'NORMAL_PLATFORM_OBSERVE');
       expect(loaded.okValue!['audioPositionMs'], 12345);
+      expect(loaded.okValue!['route'], 'normal');
+      expect(
+        loaded.okValue!['audioAsset'],
+        'audio/04_platform_narration.mp3',
+      );
     });
 
     test('clearSavedState removes saved state', () async {
@@ -275,7 +297,8 @@ void main() {
   });
 
   group('ExportService', () {
-    test('exports only the requested session when sessionId is provided', () async {
+    test('exports only the requested session when sessionId is provided',
+        () async {
       final telemetry = LocalTelemetryRepository();
       await telemetry.log({'event': 'a', 'sessionId': 'session-a'});
       await telemetry.log({'event': 'b', 'sessionId': 'session-b'});
