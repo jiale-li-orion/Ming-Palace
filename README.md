@@ -1,21 +1,31 @@
 # 明故宫 · 朱允炆在场叙事 Demo
 
-Android 优先、完全离线的 Flutter 现场叙事 Demo。用户沿南京明故宫遗址固定路线行走，通过朱允炆第一人称音频、固定视点分层复原、一次二选一互动和现场问卷完成约 6—8 分钟体验。完整需求见 [Project.md](Project.md)。
+Android 优先、完全离线的 Flutter 现场叙事 Demo。用户沿南京明故宫遗址固定路线行走，通过朱允炆第一人称音频、固定视点分层复原、A/B/C 证据系统、二选一互动和现场问卷完成约 6—8 分钟体验。完整需求见 [Project.md](Project.md)。
 
 ## 当前实现
 
-- 21 状态集中式状态机，覆盖正常登楼路线与地面替代路线。
-- 本地 `experience.json` 严格校验；配置错误显示可恢复错误页。
-- 分段本地音频支持播放、暂停、继续、重播、位置保存；缺音频时提示并允许继续。
-- 固定视点 WebP 分层淡入；观察节点含 10 秒倒计时。
-- 应用进入后台时暂停并保存；被终止后下次启动可选择恢复或放弃。
-- 问卷、JSONL 遥测、当前会话/全部日志导出。
-- 首页标题连续点击 7 次打开操作员面板，可跳转、回退、标记帮助、重播、查看/导出/清空日志和结束会话。
+- **24 阶段复合状态机**，双路线（正常登楼 + 地面替代），含定位建议、偏航暂停、安全抢占。
+- **本地 `experience.json` 严格校验**；配置错误显示可恢复错误页。
+- **分段本地音频**（7 段离线 TTS，已标注临时），支持播放、暂停、继续、重播、**整句位置恢复**；缺音频时提示并允许继续。
+- **固定视点 WebP 分层淡入**；观察节点含 90/120 秒观察器（按路线区分），引擎拒绝过早推进。
+- **A/B/C 证据层**：史实画面（A）、考古图（B）、结构注释（C），按路线自适应展现。
+- **横竖屏兼容**，旋转不触发状态变更。
+- **应用进入后台时暂停并保存**；被终止后下次启动可选择恢复或放弃。
+- **问卷、JSONL 遥测、当前会话/全部日志导出**。
+- **操作员入口**：首页标题连续点击 7 次，可跳转、回退、路线切换、重播、标记帮助、查看/导出/清空日志、结束/新建会话。
+- **传统色 UI**：米白、玄色、石青、石绿、朱砂红。
+
+## 视觉素材
+
+- 7 张 1080×1920 / 1920×1080 正式 sRGB 图片已入库，含 ICC 色彩配置，单图约 200–316 KB，按传统色重构。
+- 图片硬规范：1080×1920、sRGB 色彩空间、单张 ≤2 MB、上下各 12% 安全区。清单见 [素材指南](docs/asset-guide.md)。
+- 正式 MP3 尚未入库。7 段离线普通话 TTS 已标注“临时音频、路线未现场校准”。应用在缺音频时记录 `audio_load_failed` 并显示“音频暂缺”，流程可验收。
 
 ## 环境与构建
 
 - 已验证 Flutter `3.44.8`、Dart `3.12.2`
 - Android 最低 API 26（Android 8.0）
+- 连续集成：`flutter analyze` → **No issues found**；`flutter test` → **103/103 通过**
 
 ```bash
 flutter pub get
@@ -24,28 +34,23 @@ flutter test
 flutter build apk --debug
 ```
 
-Debug APK 输出到 `build/app/outputs/flutter-apk/app-debug.apk`。连接目标手机后可运行：
+Debug APK 输出到 `build/app/outputs/flutter-apk/app-debug.apk`。
+
+首次构建需要网络解析 Gradle 及 Android SDK 依赖。已缓存的 Gradle 9.1.0 分发可在第二次构建时跳过下载。
 
 ```bash
-flutter devices
-flutter run
+# 构建前检查
+cd android && ./gradlew --no-daemon --version && cd ..
+# 构建
+flutter build apk --debug --no-pub
 ```
-
-若本机代理指向本地端口，Flutter 测试进程无法访问回环地址，可临时执行：
 
 ```bash
-env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy \
-  NO_PROXY=localhost,127.0.0.1,::1 \
-  no_proxy=localhost,127.0.0.1,::1 flutter test
+# 查看 APK 哈希
+sha256sum build/app/outputs/flutter-apk/app-debug.apk
+# 通过 adb 安装
+adb install -r build/app/outputs/flutter-apk/app-debug.apk
 ```
-
-## 内容与素材替换
-
-配置入口是 `assets/content/experience.json`，状态 ID、Renderer、动作、后继状态和时长字段见 [内容 Schema](docs/content-schema.md)。状态转换仍以 `lib/domain/route_definition.dart` 为唯一执行入口。
-
-图片必须为 1080×1920、sRGB、单张不超过 2 MB，并保留上下各 12% 安全区。当前图片均为明确标有 `PLACEHOLDER` 的联调资源，不是史实复原完成稿。正式素材到位后保持原文件名覆盖即可，清单见 [素材指南](docs/asset-guide.md)。
-
-正式 MP3 尚未入库。应用会记录 `audio_load_failed` 并显示“音频暂缺，可继续体验”，因此流程可验收，但“所有正式音频可播放”仍需素材交付后复验。
 
 ## 数据与隐私
 
@@ -53,6 +58,7 @@ env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy \
 
 ## 验证范围
 
-自动测试覆盖两条路线、非法转换、分支合流、内容解析、会话恢复、JSONL、问卷和关键页面。集成测试覆盖两条完整状态路径。户外直射光、后台中断、连续 10 次运行、分享面板和安装包安装必须在目标 Android 手机上执行，见 [手工验收表](docs/manual-acceptance.md)。
+- **自动测试**：103 个用例覆盖双路线、非法转换、分支合流、偏航暂停、安全抢占、观察器超时、内容解析、会话恢复、JSONL 遥测、问卷、操作员面板。
+- **需真机验收的场景**：户外直射光可读性、后台中断恢复、连续 10 次运行稳定性、分享面板、adb 安装、Android 权限请求、双路线完整流程、定位拒绝后的手动推进。详见 [手工验收表](docs/manual-acceptance.md)。
 
 本版本不实现 GPS、地图、实时相机、AR/3D、账号、后端、云上传、语音识别、LLM 或远程内容更新。
