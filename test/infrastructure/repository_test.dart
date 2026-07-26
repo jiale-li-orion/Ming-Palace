@@ -5,8 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ming_palace/infrastructure/project_content_repository.dart';
 import 'package:ming_palace/infrastructure/export_service.dart';
 import 'package:ming_palace/infrastructure/local_telemetry_repository.dart';
-import 'package:ming_palace/infrastructure/local_session_repository.dart';
-import 'package:ming_palace/domain/experience_state.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -226,73 +224,6 @@ void main() {
       expect(events.last['payload'], {'choice': 'feudal_princes'});
       final summary = await repo.buildSummary('normalized-session');
       expect(summary.okValue!.questionChoice, 'feudal_princes');
-    });
-  });
-
-  group('LocalSessionRepository', () {
-    test('creates session with UUID', () async {
-      final repo = LocalSessionRepository();
-      final result = await repo.createSession();
-      expect(result.isOk, isTrue);
-      expect(result.okValue, isNotEmpty);
-      // UUID v4 format: 8-4-4-4-12 hex chars
-      expect(result.okValue, matches(RegExp(r'^[0-9a-f\-]{36}$')));
-    });
-
-    test('save and load state roundtrip', () async {
-      final repo = LocalSessionRepository();
-      await repo.createSession();
-
-      await repo.saveState(
-        ExperienceState.normalPlatformObserve,
-        12345,
-        routeId: 'normal',
-        audioAsset: 'audio/04_platform_narration.mp3',
-      );
-      final loaded = await repo.loadSavedState();
-      expect(loaded.isOk, isTrue);
-      expect(loaded.okValue, isNotNull);
-      expect(loaded.okValue!['state'], 'NORMAL_PLATFORM_OBSERVE');
-      expect(loaded.okValue!['audioPositionMs'], 12345);
-      expect(loaded.okValue!['route'], 'normal');
-      expect(
-        loaded.okValue!['audioAsset'],
-        'audio/04_platform_narration.mp3',
-      );
-    });
-
-    test('clearSavedState removes saved state', () async {
-      final repo = LocalSessionRepository();
-      await repo.createSession();
-      await repo.saveState(ExperienceState.ready, 0);
-
-      final before = await repo.loadSavedState();
-      expect(before.okValue, isNotNull);
-
-      await repo.clearSavedState();
-      final after = await repo.loadSavedState();
-      expect(after.okValue, isNull);
-    });
-
-    test('loadSavedState returns null when no state saved', () async {
-      final repo = LocalSessionRepository();
-      final result = await repo.loadSavedState();
-      expect(result.isOk, isTrue);
-      expect(result.okValue, isNull);
-    });
-
-    test('saveState preserves sessionId across calls', () async {
-      final repo = LocalSessionRepository();
-      await repo.createSession();
-
-      await repo.saveState(ExperienceState.walkToWumen, 5000);
-      final firstLoad = await repo.loadSavedState();
-      final firstSessionId = firstLoad.okValue!['sessionId'];
-      expect(firstSessionId, isNotEmpty);
-
-      await repo.saveState(ExperienceState.normalPlatformObserve, 30000);
-      final secondLoad = await repo.loadSavedState();
-      expect(secondLoad.okValue!['sessionId'], firstSessionId);
     });
   });
 
