@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "0.1.0",
+  "experienceId": "ming-palace-zhu-yunwen",
+  "evidenceLevels": {
+    "A": "史实 — directly supported by literature, paintings, gazetteers, archaeological reports",
+    "B": "学术/有依据推定 — supported by evidence but insufficient for direct confirmation",
+    "C": "叙事连接 — transitional/routing material for narrative coherence",
+    "D": "人物主观视角 — character's era-limited understanding, bias, or emotion"
+  },
+  "sources": [],
+  "notes": "Evidence index to be populated as script and visual references are finalized. See script-review-v0.5.md for the current evidence-layer annotations [A], [B], [C]."
+}

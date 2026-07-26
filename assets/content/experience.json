@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "0.1.0",
+  "experienceId": "ming-palace-zhu-yunwen",
+  "title": "朱允炆：建文四年不是空白",
+  "routes": {
+    "normal": {
+      "initialState": "INTRO"
+    },
+    "fallback": {
+      "initialState": "INTRO"
+    }
+  },
+  "scenes": {
+    "READY": {
+      "renderer": "instruction",
+      "minimumDurationMs": 0,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["start_test"],
+      "safetyMode": "stationary"
+    },
+    "INTRO": {
+      "renderer": "instruction",
+      "background": null,
+      "audio": null,
+      "minimumDurationMs": 0,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["start_test"],
+      "safetyMode": "stationary"
+    },
+    "FENGTIAN_NORTH": {
+      "renderer": "narrative",
+      "background": "images/fengtian_north/background.webp",
+      "audio": "audio/01_fengtian_north.mp3",
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["continue", "pause", "resume", "replay"],
+      "safetyMode": "stationary"
+    },
+    "WALK_TO_WUMEN": {
+      "renderer": "narrative",
+      "background": null,
+      "audio": "audio/02_walk_to_wumen.mp3",
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["continue", "pause", "resume", "replay", "arrived"],
+      "safetyMode": "walking"
+    },
+    "WUMEN_NORTH": {
+      "renderer": "narrative",
+      "background": "images/fengtian_north/background.webp",
+      "audio": "audio/03_wumen_north.mp3",
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["continue", "pause", "resume", "replay"],
+      "safetyMode": "stationary"
+    },
+    "WAIT_FOR_ROUTE_DECISION": {
+      "renderer": "instruction",
+      "background": null,
+      "audio": null,
+      "minimumDurationMs": 0,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": [],
+      "safetyMode": "stationary"
+    },
+    "NORMAL_ASCEND": {
+      "renderer": "safety",
+      "background": null,
+      "audio": null,
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["arrived"],
+      "safetyMode": "ascending"
+    },
+    "NORMAL_PLATFORM_OBSERVE": {
+      "renderer": "layered_reconstruction",
+      "background": "images/platform_north/background.webp",
+      "audio": null,
+      "minimumDurationMs": 10000,
+      "autoAdvance": false,
+      "visualSequence": [
+        {
+          "asset": "images/platform_north/central_axis.webp",
+          "startMs": 0,
+          "fadeInMs": 1200
+        },
+        {
+          "asset": "images/platform_north/fengtian_gate.webp",
+          "startMs": 1500,
+          "fadeInMs": 1200
+        },
+        {
+          "asset": "images/platform_north/fengtian_hall.webp",
+          "startMs": 3000,
+          "fadeInMs": 1500
+        },
+        {
+          "asset": "images/platform_north/civil_tower.webp",
+          "startMs": 4500,
+          "fadeInMs": 1200
+        },
+        {
+          "asset": "images/platform_north/military_tower.webp",
+          "startMs": 4500,
+          "fadeInMs": 1200
+        }
+      ],
+      "allowedActions": ["continue"],
+      "safetyMode": "stationary"
+    },
+    "NORMAL_PLATFORM_NARRATION": {
+      "renderer": "layered_reconstruction",
+      "background": "images/platform_north/background.webp",
+      "audio": "audio/04_platform_narration.mp3",
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [
+        {
+          "asset": "images/platform_north/central_axis.webp",
+          "startMs": 0,
+          "fadeInMs": 0
+        },
+        {
+          "asset": "images/platform_north/fengtian_gate.webp",
+          "startMs": 0,
+          "fadeInMs": 0
+        },
+        {
+          "asset": "images/platform_north/fengtian_hall.webp",
+          "startMs": 0,
+          "fadeInMs": 0
+        },
+        {
+          "asset": "images/platform_north/civil_tower.webp",
+          "startMs": 0,
+          "fadeInMs": 0
+        },
+        {
+          "asset": "images/platform_north/military_tower.webp",
+          "startMs": 0,
+          "fadeInMs": 0
+        }
+      ],
+      "allowedActions": ["continue", "pause", "resume", "replay"],
+      "safetyMode": "stationary"
+    },
+    "QUESTION": {
+      "renderer": "question",
+      "background": null,
+      "audio": "audio/05_question_prompt.mp3",
+      "minimumDurationMs": 3000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["choose_feudal", "choose_classics"],
+      "safetyMode": "stationary"
+    },
+    "QUESTION_BRANCH_FEUDAL": {
+      "renderer": "question",
+      "background": null,
+      "audio": "audio/06_branch_feudal.mp3",
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["continue", "pause", "resume", "replay"],
+      "safetyMode": "stationary"
+    },
+    "QUESTION_BRANCH_CLASSICS": {
+      "renderer": "question",
+      "background": null,
+      "audio": "audio/07_branch_classics.mp3",
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["continue", "pause", "resume", "replay"],
+      "safetyMode": "stationary"
+    },
+    "QUESTION_MERGE": {
+      "renderer": "narrative",
+      "background": null,
+      "audio": "audio/08_question_merge.mp3",
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["continue", "pause", "resume", "replay"],
+      "safetyMode": "stationary"
+    },
+    "NORMAL_DESCEND": {
+      "renderer": "safety",
+      "background": null,
+      "audio": null,
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["arrived"],
+      "safetyMode": "descending"
+    },
+    "WALK_THROUGH_WUMEN": {
+      "renderer": "narrative",
+      "background": null,
+      "audio": "audio/02_walk_to_wumen.mp3",
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["continue", "pause", "resume", "replay", "arrived"],
+      "safetyMode": "walking"
+    },
+    "FALLBACK_GROUND_OBSERVE": {
+      "renderer": "layered_reconstruction",
+      "background": "images/ground_fallback/background.webp",
+      "audio": null,
+      "minimumDurationMs": 8000,
+      "autoAdvance": false,
+      "visualSequence": [
+        {
+          "asset": "images/ground_fallback/central_axis.webp",
+          "startMs": 0,
+          "fadeInMs": 1200
+        },
+        {
+          "asset": "images/ground_fallback/fengtian_gate.webp",
+          "startMs": 1500,
+          "fadeInMs": 1200
+        }
+      ],
+      "allowedActions": ["continue"],
+      "safetyMode": "stationary"
+    },
+    "FALLBACK_GROUND_NARRATION": {
+      "renderer": "layered_reconstruction",
+      "background": "images/ground_fallback/background.webp",
+      "audio": "audio/09_ground_fallback.mp3",
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [
+        {
+          "asset": "images/ground_fallback/central_axis.webp",
+          "startMs": 0,
+          "fadeInMs": 0
+        },
+        {
+          "asset": "images/ground_fallback/fengtian_gate.webp",
+          "startMs": 0,
+          "fadeInMs": 0
+        }
+      ],
+      "allowedActions": ["continue", "pause", "resume", "replay"],
+      "safetyMode": "stationary"
+    },
+    "WUMEN_SOUTH_ENDING": {
+      "renderer": "narrative",
+      "background": "images/wumen_south/background.webp",
+      "audio": "audio/10_wumen_south_ending.mp3",
+      "minimumDurationMs": 5000,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["continue", "pause", "resume", "replay"],
+      "safetyMode": "stationary"
+    },
+    "ENDING_AMBIENCE": {
+      "renderer": "narrative",
+      "background": "images/wumen_south/background.webp",
+      "audio": null,
+      "minimumDurationMs": 5000,
+      "autoAdvance": true,
+      "visualSequence": [],
+      "allowedActions": [],
+      "safetyMode": "stationary"
+    },
+    "SURVEY": {
+      "renderer": "survey",
+      "background": null,
+      "audio": null,
+      "minimumDurationMs": 0,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["submit_survey"],
+      "safetyMode": "stationary"
+    },
+    "COMPLETED": {
+      "renderer": "completed",
+      "background": null,
+      "audio": null,
+      "minimumDurationMs": 0,
+      "autoAdvance": false,
+      "visualSequence": [],
+      "allowedActions": ["export", "restart"],
+      "safetyMode": "stationary"
+    }
+  }
+}

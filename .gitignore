@@ -1,0 +1,12 @@
+# Deepwork state (git-local)
+.slim/deepwork/
+
+# Flutter
+.dart_tool/
+.packages
+build/
+*.iml
+.idea/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
