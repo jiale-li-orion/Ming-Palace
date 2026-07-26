@@ -326,7 +326,7 @@ class ExperienceEngine extends ChangeNotifier {
   /// Computes a [SceneViewModel] for the current state, or `null` when the
   /// scene definition is missing from the loaded content.
   SceneViewModel? get sceneViewModel {
-    final scene = _scenes[_currentState.name];
+    final scene = _scenes[_currentState.id];
     if (scene == null) return null;
     return SceneViewModel(
       state: _currentState,

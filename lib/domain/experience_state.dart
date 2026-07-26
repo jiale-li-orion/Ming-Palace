@@ -24,7 +24,17 @@ enum ExperienceState {
   survey,
   completed;
 
-  String get id => name;
+  String get id => name
+      .replaceAllMapped(
+        RegExp(r'([a-z0-9])([A-Z])'),
+        (match) => '${match.group(1)}_${match.group(2)}',
+      )
+      .toUpperCase();
+
+  static ExperienceState fromId(String id) => ExperienceState.values.firstWhere(
+        (state) => state.id == id,
+        orElse: () => throw FormatException('未知体验状态: $id'),
+      );
 
   bool get isWalkingState =>
       this == ExperienceState.walkToWumen ||

@@ -13,7 +13,7 @@ void main() {
       expect(ExperienceState.values.length, 21);
     });
 
-    test('all states have id', () {
+  test('all states have id', () {
       for (final state in ExperienceState.values) {
         expect(state.id, isNotEmpty);
       }
@@ -55,6 +55,14 @@ void main() {
       expect(ExperienceState.ready.isTerminalState, isFalse);
       expect(ExperienceState.survey.isTerminalState, isFalse);
     });
+  });
+
+  test('state ids match Project.md uppercase snake case', () {
+    expect(
+      ExperienceState.normalPlatformObserve.id,
+      'NORMAL_PLATFORM_OBSERVE',
+    );
+    expect(ExperienceState.ready.id, 'READY');
   });
 
   group('ExperienceEvent', () {
@@ -204,9 +212,7 @@ void main() {
         (ExperienceState.fallbackGroundNarration, ExperienceEventType.audioCompleted, ExperienceState.question),
         (ExperienceState.question, ExperienceEventType.userChooseClassics, ExperienceState.questionBranchClassics),
         (ExperienceState.questionBranchClassics, ExperienceEventType.audioCompleted, ExperienceState.questionMerge),
-        (ExperienceState.questionMerge, ExperienceEventType.userContinue, ExperienceState.normalDescend),
-        (ExperienceState.normalDescend, ExperienceEventType.userArrived, ExperienceState.walkThroughWumen),
-        (ExperienceState.walkThroughWumen, ExperienceEventType.userArrived, ExperienceState.wumenSouthEnding),
+        (ExperienceState.questionMerge, ExperienceEventType.userContinue, ExperienceState.wumenSouthEnding),
         (ExperienceState.wumenSouthEnding, ExperienceEventType.userContinue, ExperienceState.endingAmbience),
         (ExperienceState.endingAmbience, ExperienceEventType.timerElapsed, ExperienceState.survey),
         (ExperienceState.survey, ExperienceEventType.userSubmitSurvey, ExperienceState.completed),
@@ -283,6 +289,36 @@ void main() {
       expect(scene.audio, isNull);
       expect(scene.visualSequence, isEmpty);
       expect(scene.hasLayers, isFalse);
+    });
+
+    test('rejects unsupported renderer', () {
+      expect(
+        () => SceneDefinition.fromJson({
+          'id': 'BROKEN',
+          'renderer': 'ar_scene',
+          'minimumDurationMs': 0,
+          'autoAdvance': false,
+          'visualSequence': <dynamic>[],
+          'allowedActions': <dynamic>[],
+          'safetyMode': 'stationary',
+        }),
+        throwsFormatException,
+      );
+    });
+
+    test('rejects negative timing values', () {
+      expect(
+        () => SceneDefinition.fromJson({
+          'id': 'BROKEN',
+          'renderer': 'instruction',
+          'minimumDurationMs': -1,
+          'autoAdvance': false,
+          'visualSequence': <dynamic>[],
+          'allowedActions': <dynamic>[],
+          'safetyMode': 'stationary',
+        }),
+        throwsFormatException,
+      );
     });
 
     test('hasLayers returns true only for multiple layers', () {

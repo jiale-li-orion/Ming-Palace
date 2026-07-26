@@ -16,9 +16,28 @@
       "renderer": "instruction",
       "minimumDurationMs": 0,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["start_test"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "start_test"
+      ],
+      "safetyMode": "stationary",
+      "id": "READY",
+      "background": null,
+      "audio": null,
+      "next": [
+        "INTRO"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "export_log",
+        "clear_data"
+      ]
     },
     "INTRO": {
       "renderer": "instruction",
@@ -26,9 +45,24 @@
       "audio": null,
       "minimumDurationMs": 0,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["start_test"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "start_test"
+      ],
+      "safetyMode": "stationary",
+      "id": "INTRO",
+      "next": [
+        "FENGTIAN_NORTH"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session"
+      ]
     },
     "FENGTIAN_NORTH": {
       "renderer": "narrative",
@@ -36,9 +70,28 @@
       "audio": "audio/01_fengtian_north.mp3",
       "minimumDurationMs": 5000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["continue", "pause", "resume", "replay"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "continue",
+        "pause",
+        "resume",
+        "replay"
+      ],
+      "safetyMode": "stationary",
+      "id": "FENGTIAN_NORTH",
+      "next": [
+        "WALK_TO_WUMEN"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "WALK_TO_WUMEN": {
       "renderer": "narrative",
@@ -46,9 +99,29 @@
       "audio": "audio/02_walk_to_wumen.mp3",
       "minimumDurationMs": 5000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["continue", "pause", "resume", "replay", "arrived"],
-      "safetyMode": "walking"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "continue",
+        "pause",
+        "resume",
+        "replay",
+        "arrived"
+      ],
+      "safetyMode": "walking",
+      "id": "WALK_TO_WUMEN",
+      "next": [
+        "WUMEN_NORTH"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "WUMEN_NORTH": {
       "renderer": "narrative",
@@ -56,9 +129,28 @@
       "audio": "audio/03_wumen_north.mp3",
       "minimumDurationMs": 5000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["continue", "pause", "resume", "replay"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "continue",
+        "pause",
+        "resume",
+        "replay"
+      ],
+      "safetyMode": "stationary",
+      "id": "WUMEN_NORTH",
+      "next": [
+        "WAIT_FOR_ROUTE_DECISION"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "WAIT_FOR_ROUTE_DECISION": {
       "renderer": "instruction",
@@ -66,9 +158,27 @@
       "audio": null,
       "minimumDurationMs": 0,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": [],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+
+      ],
+      "safetyMode": "stationary",
+      "id": "WAIT_FOR_ROUTE_DECISION",
+      "next": [
+        "NORMAL_ASCEND",
+        "FALLBACK_GROUND_OBSERVE"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "select_normal",
+        "select_fallback"
+      ]
     },
     "NORMAL_ASCEND": {
       "renderer": "safety",
@@ -76,9 +186,24 @@
       "audio": null,
       "minimumDurationMs": 5000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["arrived"],
-      "safetyMode": "ascending"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "arrived"
+      ],
+      "safetyMode": "ascending",
+      "id": "NORMAL_ASCEND",
+      "next": [
+        "NORMAL_PLATFORM_OBSERVE"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session"
+      ]
     },
     "NORMAL_PLATFORM_OBSERVE": {
       "renderer": "layered_reconstruction",
@@ -113,8 +238,21 @@
           "fadeInMs": 1200
         }
       ],
-      "allowedActions": ["continue"],
-      "safetyMode": "stationary"
+      "allowedActions": [
+        "continue"
+      ],
+      "safetyMode": "stationary",
+      "id": "NORMAL_PLATFORM_OBSERVE",
+      "next": [
+        "NORMAL_PLATFORM_NARRATION"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session"
+      ]
     },
     "NORMAL_PLATFORM_NARRATION": {
       "renderer": "layered_reconstruction",
@@ -149,8 +287,25 @@
           "fadeInMs": 0
         }
       ],
-      "allowedActions": ["continue", "pause", "resume", "replay"],
-      "safetyMode": "stationary"
+      "allowedActions": [
+        "continue",
+        "pause",
+        "resume",
+        "replay"
+      ],
+      "safetyMode": "stationary",
+      "id": "NORMAL_PLATFORM_NARRATION",
+      "next": [
+        "QUESTION"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "QUESTION": {
       "renderer": "question",
@@ -158,9 +313,27 @@
       "audio": "audio/05_question_prompt.mp3",
       "minimumDurationMs": 3000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["choose_feudal", "choose_classics"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "choose_feudal",
+        "choose_classics"
+      ],
+      "safetyMode": "stationary",
+      "id": "QUESTION",
+      "next": [
+        "QUESTION_BRANCH_FEUDAL",
+        "QUESTION_BRANCH_CLASSICS"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "QUESTION_BRANCH_FEUDAL": {
       "renderer": "question",
@@ -168,9 +341,28 @@
       "audio": "audio/06_branch_feudal.mp3",
       "minimumDurationMs": 5000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["continue", "pause", "resume", "replay"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "continue",
+        "pause",
+        "resume",
+        "replay"
+      ],
+      "safetyMode": "stationary",
+      "id": "QUESTION_BRANCH_FEUDAL",
+      "next": [
+        "QUESTION_MERGE"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "QUESTION_BRANCH_CLASSICS": {
       "renderer": "question",
@@ -178,9 +370,28 @@
       "audio": "audio/07_branch_classics.mp3",
       "minimumDurationMs": 5000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["continue", "pause", "resume", "replay"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "continue",
+        "pause",
+        "resume",
+        "replay"
+      ],
+      "safetyMode": "stationary",
+      "id": "QUESTION_BRANCH_CLASSICS",
+      "next": [
+        "QUESTION_MERGE"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "QUESTION_MERGE": {
       "renderer": "narrative",
@@ -188,9 +399,29 @@
       "audio": "audio/08_question_merge.mp3",
       "minimumDurationMs": 5000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["continue", "pause", "resume", "replay"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "continue",
+        "pause",
+        "resume",
+        "replay"
+      ],
+      "safetyMode": "stationary",
+      "id": "QUESTION_MERGE",
+      "next": [
+        "NORMAL_DESCEND",
+        "WUMEN_SOUTH_ENDING"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "NORMAL_DESCEND": {
       "renderer": "safety",
@@ -198,9 +429,24 @@
       "audio": null,
       "minimumDurationMs": 5000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["arrived"],
-      "safetyMode": "descending"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "arrived"
+      ],
+      "safetyMode": "descending",
+      "id": "NORMAL_DESCEND",
+      "next": [
+        "WALK_THROUGH_WUMEN"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session"
+      ]
     },
     "WALK_THROUGH_WUMEN": {
       "renderer": "narrative",
@@ -208,9 +454,29 @@
       "audio": "audio/02_walk_to_wumen.mp3",
       "minimumDurationMs": 5000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["continue", "pause", "resume", "replay", "arrived"],
-      "safetyMode": "walking"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "continue",
+        "pause",
+        "resume",
+        "replay",
+        "arrived"
+      ],
+      "safetyMode": "walking",
+      "id": "WALK_THROUGH_WUMEN",
+      "next": [
+        "WUMEN_SOUTH_ENDING"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "FALLBACK_GROUND_OBSERVE": {
       "renderer": "layered_reconstruction",
@@ -230,8 +496,21 @@
           "fadeInMs": 1200
         }
       ],
-      "allowedActions": ["continue"],
-      "safetyMode": "stationary"
+      "allowedActions": [
+        "continue"
+      ],
+      "safetyMode": "stationary",
+      "id": "FALLBACK_GROUND_OBSERVE",
+      "next": [
+        "FALLBACK_GROUND_NARRATION"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session"
+      ]
     },
     "FALLBACK_GROUND_NARRATION": {
       "renderer": "layered_reconstruction",
@@ -251,8 +530,25 @@
           "fadeInMs": 0
         }
       ],
-      "allowedActions": ["continue", "pause", "resume", "replay"],
-      "safetyMode": "stationary"
+      "allowedActions": [
+        "continue",
+        "pause",
+        "resume",
+        "replay"
+      ],
+      "safetyMode": "stationary",
+      "id": "FALLBACK_GROUND_NARRATION",
+      "next": [
+        "QUESTION"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "WUMEN_SOUTH_ENDING": {
       "renderer": "narrative",
@@ -260,9 +556,28 @@
       "audio": "audio/10_wumen_south_ending.mp3",
       "minimumDurationMs": 5000,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["continue", "pause", "resume", "replay"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "continue",
+        "pause",
+        "resume",
+        "replay"
+      ],
+      "safetyMode": "stationary",
+      "id": "WUMEN_SOUTH_ENDING",
+      "next": [
+        "ENDING_AMBIENCE"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "replay_audio"
+      ]
     },
     "ENDING_AMBIENCE": {
       "renderer": "narrative",
@@ -270,9 +585,24 @@
       "audio": null,
       "minimumDurationMs": 5000,
       "autoAdvance": true,
-      "visualSequence": [],
-      "allowedActions": [],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+
+      ],
+      "safetyMode": "stationary",
+      "id": "ENDING_AMBIENCE",
+      "next": [
+        "SURVEY"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session"
+      ]
     },
     "SURVEY": {
       "renderer": "survey",
@@ -280,9 +610,24 @@
       "audio": null,
       "minimumDurationMs": 0,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["submit_survey"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "submit_survey"
+      ],
+      "safetyMode": "stationary",
+      "id": "SURVEY",
+      "next": [
+        "COMPLETED"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session"
+      ]
     },
     "COMPLETED": {
       "renderer": "completed",
@@ -290,9 +635,27 @@
       "audio": null,
       "minimumDurationMs": 0,
       "autoAdvance": false,
-      "visualSequence": [],
-      "allowedActions": ["export", "restart"],
-      "safetyMode": "stationary"
+      "visualSequence": [
+
+      ],
+      "allowedActions": [
+        "export",
+        "restart"
+      ],
+      "safetyMode": "stationary",
+      "id": "COMPLETED",
+      "next": [
+        "READY"
+      ],
+      "operatorActions": [
+        "previous_step",
+        "next_step",
+        "jump_to_state",
+        "mark_help",
+        "end_session",
+        "export_log",
+        "clear_data"
+      ]
     }
   }
 }

@@ -144,5 +144,12 @@ Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>> buildFallbackTr
   t.remove(ExperienceState.normalPlatformNarration);
   t.remove(ExperienceState.normalDescend);
 
+  // The ground-level route rejoins the shared ending without presenting
+  // climb/descent instructions that do not apply to this route.
+  t[ExperienceState.questionMerge] = {
+    ExperienceEventType.userContinue: ExperienceState.wumenSouthEnding,
+    ExperienceEventType.audioCompleted: ExperienceState.wumenSouthEnding,
+  };
+
   return t;
 }

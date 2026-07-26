@@ -3,6 +3,35 @@
 /// Each scene maps to one [ExperienceState] and defines what the renderer,
 /// audio, visuals, and allowed actions are for that state.
 class SceneDefinition {
+  static const supportedRenderers = {
+    'instruction',
+    'narrative',
+    'layered_reconstruction',
+    'question',
+    'survey',
+    'safety',
+    'completed',
+  };
+  static const supportedActions = {
+    'start_test',
+    'continue',
+    'pause',
+    'resume',
+    'replay',
+    'arrived',
+    'choose_feudal',
+    'choose_classics',
+    'submit_survey',
+    'export',
+    'restart',
+  };
+  static const supportedSafetyModes = {
+    'stationary',
+    'walking',
+    'ascending',
+    'descending',
+  };
+
   final String id;
   final String renderer;
   final String? background;
@@ -11,6 +40,8 @@ class SceneDefinition {
   final bool autoAdvance;
   final List<VisualLayer> visualSequence;
   final List<String> allowedActions;
+  final List<String> next;
+  final List<String> operatorActions;
   final String safetyMode;
 
   const SceneDefinition({
@@ -22,26 +53,60 @@ class SceneDefinition {
     required this.autoAdvance,
     required this.visualSequence,
     required this.allowedActions,
+    this.next = const [],
+    this.operatorActions = const [],
     required this.safetyMode,
   });
 
   factory SceneDefinition.fromJson(Map<String, dynamic> json) {
+    final id = json['id'] as String? ?? '';
+    final renderer = json['renderer'] as String?;
+    if (renderer == null || !supportedRenderers.contains(renderer)) {
+      throw FormatException('$id.renderer 不受支持: $renderer');
+    }
+    final minimumDurationMs = json['minimumDurationMs'] as int? ?? 0;
+    if (minimumDurationMs < 0) {
+      throw FormatException('$id.minimumDurationMs 不能为负数');
+    }
+    final allowedActions = (json['allowedActions'] as List<dynamic>?)
+            ?.map((e) => e as String)
+            .toList() ??
+        [];
+    String? invalidAction;
+    for (final action in allowedActions) {
+      if (!supportedActions.contains(action)) {
+        invalidAction = action;
+        break;
+      }
+    }
+    if (invalidAction != null) {
+      throw FormatException('$id.allowedActions 不受支持: $invalidAction');
+    }
+    final safetyMode = json['safetyMode'] as String? ?? 'stationary';
+    if (!supportedSafetyModes.contains(safetyMode)) {
+      throw FormatException('$id.safetyMode 不受支持: $safetyMode');
+    }
     return SceneDefinition(
-      id: json['id'] as String? ?? '',
-      renderer: json['renderer'] as String,
+      id: id,
+      renderer: renderer,
       background: json['background'] as String?,
       audio: json['audio'] as String?,
-      minimumDurationMs: json['minimumDurationMs'] as int? ?? 0,
+      minimumDurationMs: minimumDurationMs,
       autoAdvance: json['autoAdvance'] as bool? ?? false,
       visualSequence: (json['visualSequence'] as List<dynamic>?)
               ?.map((e) => VisualLayer.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      allowedActions: (json['allowedActions'] as List<dynamic>?)
+      allowedActions: allowedActions,
+      next: (json['next'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],
-      safetyMode: json['safetyMode'] as String? ?? 'stationary',
+      operatorActions: (json['operatorActions'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      safetyMode: safetyMode,
     );
   }
 
@@ -53,6 +118,8 @@ class SceneDefinition {
         'autoAdvance': autoAdvance,
         'visualSequence': visualSequence.map((v) => v.toJson()).toList(),
         'allowedActions': allowedActions,
+        'next': next,
+        'operatorActions': operatorActions,
         'safetyMode': safetyMode,
       };
 
@@ -76,10 +143,19 @@ class VisualLayer {
   });
 
   factory VisualLayer.fromJson(Map<String, dynamic> json) {
+    final asset = json['asset'] as String?;
+    final startMs = json['startMs'] as int? ?? 0;
+    final fadeInMs = json['fadeInMs'] as int? ?? 0;
+    if (asset == null || asset.isEmpty) {
+      throw const FormatException('visualSequence.asset 不能为空');
+    }
+    if (startMs < 0 || fadeInMs < 0) {
+      throw FormatException('$asset 的动画时间不能为负数');
+    }
     return VisualLayer(
-      asset: json['asset'] as String,
-      startMs: json['startMs'] as int? ?? 0,
-      fadeInMs: json['fadeInMs'] as int? ?? 0,
+      asset: asset,
+      startMs: startMs,
+      fadeInMs: fadeInMs,
     );
   }
 
