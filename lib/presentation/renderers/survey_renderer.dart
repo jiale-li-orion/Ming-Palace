@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../application/experience_controller.dart';
 import '../../app/theme.dart';
 import '../../domain/experience_event.dart';
+import '../../domain/session_summary.dart';
 import 'scene_renderer.dart';
 
 /// Renders the SURVEY state — 5-question post-experience form (Project.md §9).
@@ -20,14 +21,14 @@ class SurveyRenderer implements SceneRenderer {
 
   @override
   Widget build(BuildContext context, SceneViewModel viewModel) {
-    return _SurveyForm(onSubmit: () {
-      onEvent(const UserAction(UserActionType.submitSurvey));
+    return _SurveyForm(onSubmit: (answers) {
+      onEvent(SubmitSurvey(answers));
     });
   }
 }
 
 class _SurveyForm extends StatefulWidget {
-  final VoidCallback onSubmit;
+  final ValueChanged<SurveyAnswers> onSubmit;
   const _SurveyForm({required this.onSubmit});
 
   @override
@@ -123,7 +124,17 @@ class _SurveyFormState extends State<_SurveyForm> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: widget.onSubmit,
+                onPressed: () {
+                  widget.onSubmit(
+                    SurveyAnswers(
+                      experienceDescription: _q1Controller.text.trim(),
+                      mostEngagingMoment: _q2Controller.text.trim(),
+                      confusingMoment: _q3Controller.text.trim(),
+                      wantsLongerExperience: _q4Answer,
+                      wantsNextTest: _q5Answer,
+                    ),
+                  );
+                },
                 child: const Text('提交问卷'),
               ),
             ),

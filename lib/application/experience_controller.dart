@@ -159,7 +159,7 @@ class ExperienceEngine extends ChangeNotifier {
       _lastError = null;
       await _persistState(0);
       _logTelemetry({
-        'event': 'session_started',
+        'event': 'session_created',
         'sessionId': _sessionId,
       });
       notifyListeners();
@@ -207,6 +207,14 @@ class ExperienceEngine extends ChangeNotifier {
       });
       notifyListeners();
       return;
+    }
+
+    if (event is SubmitSurvey) {
+      _logTelemetry({
+        'event': 'survey_submitted',
+        'sessionId': _sessionId,
+        'payload': event.answers.toJson(),
+      });
     }
 
     // Track the user's branching choice for the final summary.
@@ -257,6 +265,14 @@ class ExperienceEngine extends ChangeNotifier {
       'eventType': eventType.name,
       'route': _currentRoute.id,
     });
+
+    if (_currentState == ExperienceState.completed) {
+      _logTelemetry({
+        'event': 'session_completed',
+        'sessionId': _sessionId,
+      });
+      unawaited(sessionRepository.clearSavedState());
+    }
 
     notifyListeners();
 
@@ -377,6 +393,10 @@ class ExperienceEngine extends ChangeNotifier {
   /// transition-table lookups.  Returns `null` for events that carry no
   /// transition semantics (e.g. utility operator actions).
   ExperienceEventType? _mapEventToType(ExperienceEvent event) {
+    if (event is SubmitSurvey) {
+      return ExperienceEventType.userSubmitSurvey;
+    }
+
     if (event is UserAction) {
       switch (event.action) {
         case UserActionType.startTest:

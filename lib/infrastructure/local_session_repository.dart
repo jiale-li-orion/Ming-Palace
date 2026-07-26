@@ -36,9 +36,9 @@ abstract interface class SessionRepository {
 ///   - `saved_state.json` — session resume data
 class LocalSessionRepository implements SessionRepository {
   static const String _stateFileName = 'saved_state.json';
-  static const String _telemetryFileName = 'telemetry.jsonl';
 
   final Uuid _uuid = const Uuid();
+  String? _currentSessionId;
 
   // --- public API -----------------------------------------------------------
 
@@ -46,24 +46,7 @@ class LocalSessionRepository implements SessionRepository {
   Future<Result<String, AppError>> createSession() async {
     try {
       final sessionId = _uuid.v4();
-      final now = DateTime.now().toUtc().toIso8601String();
-
-      final event = <String, dynamic>{
-        'schemaVersion': 1,
-        'sessionId': sessionId,
-        'timestamp': now,
-        'event': 'session_created',
-        'state': null,
-        'payload': <String, dynamic>{},
-      };
-
-      final file = await _telemetryFile;
-      await file.writeAsString(
-        '${json.encode(event)}\n',
-        mode: FileMode.append,
-        flush: true,
-      );
-
+      _currentSessionId = sessionId;
       return Ok(sessionId);
     } catch (_) {
       return Err(AppError.sessionCreationFailed);
@@ -78,6 +61,7 @@ class LocalSessionRepository implements SessionRepository {
 
       final content = await file.readAsString();
       final decoded = json.decode(content) as Map<String, dynamic>;
+      _currentSessionId = decoded['sessionId'] as String?;
       return Ok(decoded);
     } catch (_) {
       // Corrupted or unreadable state → treat as no saved state.
@@ -92,13 +76,18 @@ class LocalSessionRepository implements SessionRepository {
   ) async {
     try {
       // Preserve the sessionId from any previously saved state.
-      final existing = await loadSavedState();
-      final sessionId = existing.okValue?['sessionId'] as String? ?? '';
+      if (_currentSessionId == null) {
+        final existing = await loadSavedState();
+        _currentSessionId = existing.okValue?['sessionId'] as String?;
+      }
+      if (_currentSessionId == null || _currentSessionId!.isEmpty) {
+        return Err(AppError.sessionCreationFailed);
+      }
 
       final stateData = <String, dynamic>{
         'state': state.id,
         'audioPositionMs': audioPositionMs,
-        'sessionId': sessionId,
+        'sessionId': _currentSessionId,
         'timestamp': DateTime.now().toUtc().toIso8601String(),
       };
 
@@ -128,8 +117,4 @@ class LocalSessionRepository implements SessionRepository {
     return File('${dir.path}/$_stateFileName');
   }
 
-  Future<File> get _telemetryFile async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/$_telemetryFileName');
-  }
 }

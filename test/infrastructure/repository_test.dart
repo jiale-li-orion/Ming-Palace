@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ming_palace/infrastructure/local_content_repository.dart';
+import 'package:ming_palace/infrastructure/export_service.dart';
 import 'package:ming_palace/infrastructure/local_telemetry_repository.dart';
 import 'package:ming_palace/infrastructure/local_session_repository.dart';
 import 'package:ming_palace/domain/experience_state.dart';
@@ -31,12 +32,6 @@ class FakePathProvider extends PathProviderPlatform with MockPlatformInterfaceMi
 
   @override
   Future<String> getTemporaryPath() async => tempDir.path;
-}
-
-/// Mock platform interface base for test compatibility.
-abstract class MockPlatformInterfaceMixin extends PlatformInterface {
-  MockPlatformInterfaceMixin() : super(token: _token);
-  static final Object _token = Object();
 }
 
 // ---------------------------------------------------------------------------
@@ -202,6 +197,24 @@ void main() {
       final summaryB = await repo.buildSummary('sess-b');
       expect(summaryB.okValue!.questionChoice, isNull);
     });
+
+    test('normalizes event details into payload', () async {
+      final repo = LocalTelemetryRepository();
+      await repo.log({
+        'event': 'session_created',
+        'sessionId': 'normalized-session',
+      });
+      await repo.log({
+        'event': 'question_choice',
+        'sessionId': 'normalized-session',
+        'choice': 'feudal_princes',
+      });
+
+      final events = (await repo.exportAll()).okValue!;
+      expect(events.last['payload'], {'choice': 'feudal_princes'});
+      final summary = await repo.buildSummary('normalized-session');
+      expect(summary.okValue!.questionChoice, 'feudal_princes');
+    });
   });
 
   group('LocalSessionRepository', () {
@@ -222,7 +235,7 @@ void main() {
       final loaded = await repo.loadSavedState();
       expect(loaded.isOk, isTrue);
       expect(loaded.okValue, isNotNull);
-      expect(loaded.okValue!['state'], 'normalPlatformObserve');
+      expect(loaded.okValue!['state'], 'NORMAL_PLATFORM_OBSERVE');
       expect(loaded.okValue!['audioPositionMs'], 12345);
     });
 
@@ -253,10 +266,30 @@ void main() {
       await repo.saveState(ExperienceState.walkToWumen, 5000);
       final firstLoad = await repo.loadSavedState();
       final firstSessionId = firstLoad.okValue!['sessionId'];
+      expect(firstSessionId, isNotEmpty);
 
       await repo.saveState(ExperienceState.normalPlatformObserve, 30000);
       final secondLoad = await repo.loadSavedState();
       expect(secondLoad.okValue!['sessionId'], firstSessionId);
+    });
+  });
+
+  group('ExportService', () {
+    test('exports only the requested session when sessionId is provided', () async {
+      final telemetry = LocalTelemetryRepository();
+      await telemetry.log({'event': 'a', 'sessionId': 'session-a'});
+      await telemetry.log({'event': 'b', 'sessionId': 'session-b'});
+      final output = '${tempDir.path}/session-a.json';
+
+      final result = await ExportService().exportAsJson(
+        output,
+        sessionId: 'session-a',
+      );
+
+      expect(result.isOk, isTrue);
+      final events = json.decode(File(output).readAsStringSync()) as List;
+      expect(events, hasLength(1));
+      expect((events.single as Map<String, dynamic>)['sessionId'], 'session-a');
     });
   });
 }

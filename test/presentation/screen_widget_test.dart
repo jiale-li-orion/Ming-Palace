@@ -1,4 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ming_palace/application/experience_controller.dart';
+import 'package:ming_palace/domain/experience_event.dart';
+import 'package:ming_palace/domain/experience_state.dart';
+import 'package:ming_palace/domain/scene_definition.dart';
+import 'package:ming_palace/presentation/renderers/survey_renderer.dart';
 import 'package:ming_palace/presentation/screens/experience_screen.dart';
 
 // Widget tests for the ExperienceScreen
@@ -78,8 +84,53 @@ void main() {
 
   group('SurveyRenderer', () {
     testWidgets('shows five questions and submit button', (tester) async {
-      // TODO: pump SurveyRenderer
-      // TODO: verify all 5 questions present and "提交问卷" button
+      ExperienceEvent? submitted;
+      const scene = SceneDefinition(
+        id: 'SURVEY',
+        renderer: 'survey',
+        minimumDurationMs: 0,
+        autoAdvance: false,
+        visualSequence: [],
+        allowedActions: ['submit_survey'],
+        safetyMode: 'stationary',
+      );
+      const viewModel = SceneViewModel(
+        state: ExperienceState.survey,
+        scene: scene,
+        isWalking: false,
+        isSafetyMode: false,
+        visualLayers: [],
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => SurveyRenderer(
+                onEvent: (event) => submitted = event,
+              ).build(context, viewModel),
+            ),
+          ),
+        ),
+      );
+
+      final fields = find.byType(TextField);
+      expect(fields, findsNWidgets(3));
+      await tester.enterText(fields.at(0), '现场叙事');
+      await tester.enterText(fields.at(1), '城台复原');
+      await tester.enterText(fields.at(2), '路线提示');
+      await tester.ensureVisible(find.text('是').first);
+      await tester.tap(find.text('是').first);
+      await tester.ensureVisible(find.text('提交问卷'));
+      await tester.tap(find.text('提交问卷'));
+
+      expect(submitted, isA<SubmitSurvey>());
+      final answers = (submitted as SubmitSurvey).answers;
+      expect(answers.experienceDescription, '现场叙事');
+      expect(answers.mostEngagingMoment, '城台复原');
+      expect(answers.confusingMoment, '路线提示');
+      expect(answers.wantsLongerExperience, isTrue);
+      expect(answers.wantsNextTest, isFalse);
     });
   });
 

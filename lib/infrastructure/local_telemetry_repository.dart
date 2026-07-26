@@ -39,12 +39,31 @@ class LocalTelemetryRepository implements TelemetryRepository {
   @override
   Future<void> log(Map<String, dynamic> event) async {
     try {
-      final enriched = Map<String, dynamic>.from(event)
-        ..putIfAbsent('schemaVersion', () => 1)
-        ..putIfAbsent(
-          'timestamp',
-          () => DateTime.now().toUtc().toIso8601String(),
-        );
+      const envelopeKeys = {
+        'schemaVersion',
+        'sessionId',
+        'timestamp',
+        'event',
+        'state',
+        'payload',
+      };
+      final payload = <String, dynamic>{
+        ...?event['payload'] as Map<String, dynamic>?,
+      };
+      for (final entry in event.entries) {
+        if (!envelopeKeys.contains(entry.key)) {
+          payload[entry.key] = entry.value;
+        }
+      }
+      final enriched = <String, dynamic>{
+        'schemaVersion': event['schemaVersion'] ?? 1,
+        'sessionId': event['sessionId'],
+        'timestamp': event['timestamp'] ??
+            DateTime.now().toUtc().toIso8601String(),
+        'event': event['event'],
+        'state': event['state'],
+        'payload': payload,
+      };
 
       final file = await _telemetryFile;
       await file.writeAsString(

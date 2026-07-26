@@ -1,4 +1,5 @@
 import 'experience_state.dart';
+import 'session_summary.dart';
 
 /// Events that can trigger state transitions in the experience engine.
 sealed class ExperienceEvent {
@@ -25,6 +26,13 @@ class AudioCompleted extends ExperienceEvent {
 /// A timed auto-advance fired.
 class TimerElapsed extends ExperienceEvent {
   const TimerElapsed();
+}
+
+/// User submitted the five-question post-experience survey.
+class SubmitSurvey extends ExperienceEvent {
+  final SurveyAnswers answers;
+
+  const SubmitSurvey(this.answers);
 }
 
 /// App returned from background; contains saved state for recovery.

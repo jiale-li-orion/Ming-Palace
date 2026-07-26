@@ -3,6 +3,10 @@ import 'package:ming_palace/application/experience_controller.dart';
 import 'package:ming_palace/domain/experience_event.dart';
 import 'package:ming_palace/domain/experience_state.dart';
 import 'package:ming_palace/domain/scene_definition.dart';
+import 'package:ming_palace/domain/session_summary.dart';
+import 'package:ming_palace/infrastructure/local_content_repository.dart';
+import 'package:ming_palace/infrastructure/local_session_repository.dart';
+import 'package:ming_palace/infrastructure/local_telemetry_repository.dart';
 import 'package:ming_palace/shared/app_error.dart';
 import 'package:ming_palace/shared/result.dart';
 
@@ -392,8 +396,9 @@ void main() {
   });
 
   group('Operator panel', () {
-    test('7-tap unlocks operator', () {
+    test('7-tap unlocks operator', () async {
       final engine = _createEngine();
+      await engine.initialize();
 
       expect(engine.isOperatorUnlocked, isFalse);
 
@@ -406,8 +411,9 @@ void main() {
       expect(engine.isOperatorUnlocked, isFalse);
     });
 
-    test('setRoute switches between normal and fallback', () {
+    test('setRoute switches between normal and fallback', () async {
       final engine = _createEngine();
+      await engine.initialize();
 
       engine.setRoute('fallback');
       expect(engine.currentRoute.id, 'fallback');
@@ -420,8 +426,9 @@ void main() {
   });
 
   group('App resume', () {
-    test('AppResumed restores saved state', () {
+    test('AppResumed restores saved state', () async {
       final engine = _createEngine();
+      await engine.initialize();
 
       engine.handleEvent(AppResumed(ExperienceState.normalPlatformObserve, 30000));
       expect(engine.currentState, ExperienceState.normalPlatformObserve);
@@ -453,6 +460,33 @@ void main() {
 
       engine.handleEvent(UserAction(UserActionType.arrived));
       // Engine not initialized, should do nothing
+    });
+
+    test('survey submission logs all answers before completion', () async {
+      final telemetry = FakeTelemetryRepository();
+      final engine = ExperienceEngine(
+        contentRepository: FakeContentRepository(_defaultScenes()),
+        telemetryRepository: telemetry,
+        sessionRepository: FakeSessionRepository(),
+      );
+      await engine.initialize();
+      await engine.startSession();
+      engine.handleEvent(const AppResumed(ExperienceState.survey, 0));
+
+      const answers = SurveyAnswers(
+        experienceDescription: '现场叙事',
+        mostEngagingMoment: '城台复原',
+        confusingMoment: '没有',
+        wantsLongerExperience: true,
+        wantsNextTest: false,
+      );
+      engine.handleEvent(const SubmitSurvey(answers));
+
+      expect(engine.currentState, ExperienceState.completed);
+      final event = telemetry.events.firstWhere(
+        (item) => item['event'] == 'survey_submitted',
+      );
+      expect(event['payload'], answers.toJson());
     });
   });
 }

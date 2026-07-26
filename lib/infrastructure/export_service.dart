@@ -16,7 +16,10 @@ class ExportService {
 
   /// Reads every event from the telemetry file and writes a pretty-printed
   /// JSON array to [filePath].  Returns the same [filePath] on success.
-  Future<Result<String, AppError>> exportAsJson(String filePath) async {
+  Future<Result<String, AppError>> exportAsJson(
+    String filePath, {
+    String? sessionId,
+  }) async {
     try {
       final dir = await getApplicationDocumentsDirectory();
       final telemetryFile = File('${dir.path}/$_telemetryFileName');
@@ -24,10 +27,15 @@ class ExportService {
       final List<Map<String, dynamic>> events;
       if (await telemetryFile.exists()) {
         final lines = await telemetryFile.readAsLines();
-        events = lines
+        final allEvents = lines
             .where((l) => l.trim().isNotEmpty)
             .map((l) => json.decode(l) as Map<String, dynamic>)
             .toList();
+        events = sessionId == null
+            ? allEvents
+            : allEvents
+                .where((event) => event['sessionId'] == sessionId)
+                .toList();
       } else {
         events = [];
       }
