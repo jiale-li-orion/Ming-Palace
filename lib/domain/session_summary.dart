@@ -2,16 +2,6 @@
 ///
 /// Matches the schema defined in Project.md §8.1.
 class SessionSummary {
-  final String sessionId;
-  final DateTime startedAt;
-  final DateTime? endedAt;
-  final bool completed;
-  final String route;
-  final int durationSeconds;
-  final String? questionChoice;
-  final int helpCount;
-  final bool interrupted;
-  final SurveyAnswers? survey;
 
   const SessionSummary({
     required this.sessionId,
@@ -25,6 +15,16 @@ class SessionSummary {
     required this.interrupted,
     this.survey,
   });
+  final String sessionId;
+  final DateTime startedAt;
+  final DateTime? endedAt;
+  final bool completed;
+  final String route;
+  final int durationSeconds;
+  final String? questionChoice;
+  final int helpCount;
+  final bool interrupted;
+  final SurveyAnswers? survey;
 
   Map<String, dynamic> toJson() => {
         'sessionId': sessionId,
@@ -42,11 +42,6 @@ class SessionSummary {
 
 /// User's survey responses (Project.md §9).
 class SurveyAnswers {
-  final String experienceDescription;
-  final String mostEngagingMoment;
-  final String confusingMoment;
-  final bool wantsLongerExperience;
-  final bool wantsNextTest;
 
   const SurveyAnswers({
     required this.experienceDescription,
@@ -55,6 +50,11 @@ class SurveyAnswers {
     required this.wantsLongerExperience,
     required this.wantsNextTest,
   });
+  final String experienceDescription;
+  final String mostEngagingMoment;
+  final String confusingMoment;
+  final bool wantsLongerExperience;
+  final bool wantsNextTest;
 
   Map<String, dynamic> toJson() => {
         'experienceDescription': experienceDescription,

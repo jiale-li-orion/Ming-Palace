@@ -15,9 +15,9 @@ import 'package:ming_palace/shared/result.dart';
 // ---------------------------------------------------------------------------
 
 class FakeContentRepository implements ContentRepository {
-  final Map<String, SceneDefinition> scenes;
 
   FakeContentRepository(this.scenes);
+  final Map<String, SceneDefinition> scenes;
 
   @override
   Future<Result<Map<String, SceneDefinition>, AppError>> loadScenes() async {
@@ -28,7 +28,7 @@ class FakeContentRepository implements ContentRepository {
 class FailingContentRepository implements ContentRepository {
   @override
   Future<Result<Map<String, SceneDefinition>, AppError>> loadScenes() async {
-    return Err(AppError.contentLoadFailed);
+    return const Err(AppError.contentLoadFailed);
   }
 }
 
@@ -42,7 +42,7 @@ class FakeTelemetryRepository implements TelemetryRepository {
 
   @override
   Future<Result<SessionSummary, AppError>> buildSummary(String id) async {
-    return Err(AppError.telemetryWriteFailed);
+    return const Err(AppError.telemetryWriteFailed);
   }
 
   @override
@@ -53,7 +53,7 @@ class FakeTelemetryRepository implements TelemetryRepository {
   @override
   Future<Result<void, AppError>> clearAll() async {
     events.clear();
-    return Ok(null);
+    return const Ok(null);
   }
 }
 
@@ -86,13 +86,13 @@ class FakeSessionRepository implements SessionRepository {
       'audioAsset': audioAsset,
       'audioPositionMs': position,
     };
-    return Ok(null);
+    return const Ok(null);
   }
 
   @override
   Future<Result<void, AppError>> clearSavedState() async {
     _savedState = null;
-    return Ok(null);
+    return const Ok(null);
   }
 }
 
@@ -240,7 +240,7 @@ void main() {
       tap(UserActionType.startTest); // intro → fengtianNorth
       expect(engine.currentState, ExperienceState.fengtianNorth);
 
-      engine.handleEvent(AudioCompleted()); // fengtianNorth → walkToWumen
+      engine.handleEvent(const AudioCompleted()); // fengtianNorth → walkToWumen
       expect(engine.currentState, ExperienceState.walkToWumen);
 
       tap(UserActionType.arrived); // walkToWumen → wumenNorth
@@ -250,7 +250,7 @@ void main() {
       expect(engine.currentState, ExperienceState.waitForRouteDecision);
 
       engine.handleEvent(
-          OperatorAction(OperatorActionType.switchToNormal)); // → normalAscend
+          const OperatorAction(OperatorActionType.switchToNormal)); // → normalAscend
       expect(engine.currentState, ExperienceState.normalAscend);
 
       tap(UserActionType.arrived); // normalAscend → normalPlatformObserve
@@ -259,14 +259,14 @@ void main() {
       tap(UserActionType.continue_); // → normalPlatformNarration
       expect(engine.currentState, ExperienceState.normalPlatformNarration);
 
-      engine.handleEvent(AudioCompleted()); // → question
+      engine.handleEvent(const AudioCompleted()); // → question
       expect(engine.currentState, ExperienceState.question);
 
       tap(UserActionType.chooseFeudal); // → questionBranchFeudal
       expect(engine.currentState, ExperienceState.questionBranchFeudal);
       expect(engine.questionChoice, 'feudal');
 
-      engine.handleEvent(AudioCompleted()); // → questionMerge
+      engine.handleEvent(const AudioCompleted()); // → questionMerge
       expect(engine.currentState, ExperienceState.questionMerge);
 
       tap(UserActionType.continue_); // → normalDescend
@@ -278,10 +278,10 @@ void main() {
       tap(UserActionType.arrived); // → wumenSouthEnding
       expect(engine.currentState, ExperienceState.wumenSouthEnding);
 
-      engine.handleEvent(AudioCompleted()); // → endingAmbience
+      engine.handleEvent(const AudioCompleted()); // → endingAmbience
       expect(engine.currentState, ExperienceState.endingAmbience);
 
-      engine.handleEvent(TimerElapsed()); // → survey
+      engine.handleEvent(const TimerElapsed()); // → survey
       expect(engine.currentState, ExperienceState.survey);
 
       tap(UserActionType.submitSurvey); // → completed
@@ -294,13 +294,13 @@ void main() {
 
       tap(UserActionType.startTest);
       tap(UserActionType.startTest);
-      engine.handleEvent(AudioCompleted());
+      engine.handleEvent(const AudioCompleted());
       tap(UserActionType.arrived);
       tap(UserActionType.continue_);
-      engine.handleEvent(OperatorAction(OperatorActionType.switchToNormal));
+      engine.handleEvent(const OperatorAction(OperatorActionType.switchToNormal));
       tap(UserActionType.arrived);
       tap(UserActionType.continue_);
-      engine.handleEvent(AudioCompleted());
+      engine.handleEvent(const AudioCompleted());
 
       tap(UserActionType.chooseClassics);
       expect(engine.currentState, ExperienceState.questionBranchClassics);
@@ -309,7 +309,7 @@ void main() {
 
     test('invalid transition does not crash', () {
       // Sending audioCompleted in READY state (no transition)
-      engine.handleEvent(AudioCompleted());
+      engine.handleEvent(const AudioCompleted());
       expect(engine.currentState, ExperienceState.ready);
       expect(engine.lastError, contains('无有效转换'));
     });
@@ -318,17 +318,17 @@ void main() {
       void tap(UserActionType action) => engine.handleEvent(UserAction(action));
       tap(UserActionType.startTest);
       tap(UserActionType.startTest);
-      engine.handleEvent(AudioCompleted());
+      engine.handleEvent(const AudioCompleted());
       tap(UserActionType.arrived);
       tap(UserActionType.continue_);
-      engine.handleEvent(OperatorAction(OperatorActionType.switchToNormal));
+      engine.handleEvent(const OperatorAction(OperatorActionType.switchToNormal));
       tap(UserActionType.arrived);
       tap(UserActionType.continue_);
-      engine.handleEvent(AudioCompleted());
+      engine.handleEvent(const AudioCompleted());
 
       // Test feudal branch
       tap(UserActionType.chooseFeudal);
-      engine.handleEvent(AudioCompleted());
+      engine.handleEvent(const AudioCompleted());
       expect(engine.currentState, ExperienceState.questionMerge);
     });
 
@@ -348,7 +348,7 @@ void main() {
     test('sceneViewModel returns null when current scene is absent', () async {
       // If scene data is missing a state, vm should be null
       final incompleteScenes = <String, SceneDefinition>{
-        'ready': SceneDefinition(
+        'ready': const SceneDefinition(
           id: 'ready',
           renderer: 'instruction',
           minimumDurationMs: 0,
@@ -385,7 +385,7 @@ void main() {
       await engine.startSession();
       engine.operatorJump(ExperienceState.normalPlatformObserve);
 
-      engine.handleEvent(UserAction(UserActionType.continue_));
+      engine.handleEvent(const UserAction(UserActionType.continue_));
 
       expect(engine.currentState, ExperienceState.normalPlatformObserve);
       expect(
@@ -401,20 +401,20 @@ void main() {
 
       tap(UserActionType.startTest);
       tap(UserActionType.startTest);
-      engine.handleEvent(AudioCompleted());
+      engine.handleEvent(const AudioCompleted());
       tap(UserActionType.arrived);
       tap(UserActionType.continue_);
-      engine.handleEvent(OperatorAction(OperatorActionType.switchToNormal));
+      engine.handleEvent(const OperatorAction(OperatorActionType.switchToNormal));
       tap(UserActionType.arrived);
       tap(UserActionType.continue_);
-      engine.handleEvent(AudioCompleted());
+      engine.handleEvent(const AudioCompleted());
       tap(UserActionType.chooseFeudal);
-      engine.handleEvent(AudioCompleted());
+      engine.handleEvent(const AudioCompleted());
       tap(UserActionType.continue_);
       tap(UserActionType.arrived);
       tap(UserActionType.arrived);
-      engine.handleEvent(AudioCompleted());
-      engine.handleEvent(TimerElapsed());
+      engine.handleEvent(const AudioCompleted());
+      engine.handleEvent(const TimerElapsed());
       tap(UserActionType.submitSurvey);
 
       expect(engine.currentState, ExperienceState.completed);
@@ -438,12 +438,12 @@ void main() {
 
       tap(UserActionType.startTest);
       tap(UserActionType.startTest);
-      engine.handleEvent(AudioCompleted());
+      engine.handleEvent(const AudioCompleted());
       tap(UserActionType.arrived);
       tap(UserActionType.continue_);
 
       // Select fallback route at decision point
-      engine.handleEvent(OperatorAction(OperatorActionType.switchToFallback));
+      engine.handleEvent(const OperatorAction(OperatorActionType.switchToFallback));
       expect(engine.currentState, ExperienceState.fallbackGroundObserve);
 
       tap(UserActionType.continue_); // → fallbackGroundNarration
@@ -515,7 +515,7 @@ void main() {
       await engine.initialize();
 
       engine.handleEvent(
-          AppResumed(ExperienceState.normalPlatformObserve, 30000));
+          const AppResumed(ExperienceState.normalPlatformObserve, 30000));
       expect(engine.currentState, ExperienceState.normalPlatformObserve);
     });
 
@@ -549,7 +549,7 @@ void main() {
       await engine.initialize();
       await engine.startSession();
 
-      engine.handleEvent(UserAction(UserActionType.startTest));
+      engine.handleEvent(const UserAction(UserActionType.startTest));
 
       expect(telemetry.events, isNotEmpty);
       final transitionEvent = telemetry.events.firstWhere(
@@ -561,7 +561,7 @@ void main() {
     test('invalid transition is logged', () {
       final engine = _createEngine();
 
-      engine.handleEvent(UserAction(UserActionType.arrived));
+      engine.handleEvent(const UserAction(UserActionType.arrived));
       // Engine not initialized, should do nothing
     });
 

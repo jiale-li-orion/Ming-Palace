@@ -13,13 +13,6 @@ import 'scene_renderer.dart';
 /// - **QUESTION**: shows the binary choice with two large buttons.
 /// - **Branch states**: shows audio playing with branch-specific context.
 class QuestionRenderer implements SceneRenderer {
-  final void Function(ExperienceEvent) onEvent;
-  final bool isPlaying;
-  final VoidCallback? onPause;
-  final VoidCallback? onResume;
-  final VoidCallback? onReplay;
-  final Duration currentPosition;
-  final Duration duration;
 
   const QuestionRenderer({
     required this.onEvent,
@@ -30,6 +23,13 @@ class QuestionRenderer implements SceneRenderer {
     this.currentPosition = Duration.zero,
     this.duration = Duration.zero,
   });
+  final void Function(ExperienceEvent) onEvent;
+  final bool isPlaying;
+  final VoidCallback? onPause;
+  final VoidCallback? onResume;
+  final VoidCallback? onReplay;
+  final Duration currentPosition;
+  final Duration duration;
 
   @override
   Widget build(BuildContext context, SceneViewModel viewModel) {
@@ -59,8 +59,8 @@ class QuestionRenderer implements SceneRenderer {
 // ---------------------------------------------------------------------------
 
 class _QuestionChoice extends StatelessWidget {
-  final void Function(ExperienceEvent) onEvent;
   const _QuestionChoice({required this.onEvent});
+  final void Function(ExperienceEvent) onEvent;
 
   @override
   Widget build(BuildContext context) {
@@ -120,14 +120,6 @@ class _QuestionChoice extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _QuestionBranch extends StatelessWidget {
-  final void Function(ExperienceEvent) onEvent;
-  final SceneViewModel viewModel;
-  final bool isPlaying;
-  final VoidCallback? onPause;
-  final VoidCallback? onResume;
-  final VoidCallback? onReplay;
-  final Duration currentPosition;
-  final Duration duration;
 
   const _QuestionBranch({
     required this.onEvent,
@@ -139,6 +131,14 @@ class _QuestionBranch extends StatelessWidget {
     required this.currentPosition,
     required this.duration,
   });
+  final void Function(ExperienceEvent) onEvent;
+  final SceneViewModel viewModel;
+  final bool isPlaying;
+  final VoidCallback? onPause;
+  final VoidCallback? onResume;
+  final VoidCallback? onReplay;
+  final Duration currentPosition;
+  final Duration duration;
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +157,7 @@ class _QuestionBranch extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.15),
+                color: AppColors.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(

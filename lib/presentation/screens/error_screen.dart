@@ -6,9 +6,6 @@ import '../../app/theme.dart';
 ///
 /// Displays the error message and provides retry / export-log actions.
 class ErrorScreen extends StatelessWidget {
-  final String message;
-  final VoidCallback? onRetry;
-  final VoidCallback? onExportLog;
 
   const ErrorScreen({
     required this.message,
@@ -16,6 +13,9 @@ class ErrorScreen extends StatelessWidget {
     this.onExportLog,
     super.key,
   });
+  final String message;
+  final VoidCallback? onRetry;
+  final VoidCallback? onExportLog;
 
   @override
   Widget build(BuildContext context) {

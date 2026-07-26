@@ -16,11 +16,6 @@ import 'experience_controller.dart';
 /// so the operator panel can display live stats without querying the
 /// telemetry repository on every change.
 class OperatorController extends ChangeNotifier {
-  final ExperienceEngine _engine;
-  final VoidCallback? _onReplayAudio;
-  final Future<void> Function()? _onExportLog;
-  final Future<void> Function()? _onViewLog;
-  final Future<void> Function()? _onClearData;
 
   OperatorController(
     this._engine, {
@@ -33,6 +28,11 @@ class OperatorController extends ChangeNotifier {
         _onViewLog = onViewLog,
         _onClearData = onClearData,
         _panelVisible = false;
+  final ExperienceEngine _engine;
+  final VoidCallback? _onReplayAudio;
+  final Future<void> Function()? _onExportLog;
+  final Future<void> Function()? _onViewLog;
+  final Future<void> Function()? _onClearData;
 
   // ---- internal state ------------------------------------------------------
 

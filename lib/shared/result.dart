@@ -17,11 +17,11 @@ sealed class Result<T, E> {
 }
 
 class Ok<T, E> extends Result<T, E> {
-  final T value;
   const Ok(this.value);
+  final T value;
 }
 
 class Err<T, E> extends Result<T, E> {
-  final E error;
   const Err(this.error);
+  final E error;
 }

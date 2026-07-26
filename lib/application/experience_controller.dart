@@ -19,12 +19,6 @@ import '../shared/result.dart';
 /// Derived view model for the current scene, computed from the active
 /// [ExperienceState] and its corresponding [SceneDefinition].
 class SceneViewModel {
-  final ExperienceState state;
-  final SceneDefinition scene;
-  final bool isWalking;
-  final bool isSafetyMode;
-  final String? activeAudioAsset;
-  final List<VisualLayer> visualLayers;
 
   const SceneViewModel({
     required this.state,
@@ -34,6 +28,12 @@ class SceneViewModel {
     this.activeAudioAsset,
     required this.visualLayers,
   });
+  final ExperienceState state;
+  final SceneDefinition scene;
+  final bool isWalking;
+  final bool isSafetyMode;
+  final String? activeAudioAsset;
+  final List<VisualLayer> visualLayers;
 
   // -- computed delegates to SceneDefinition --------------------------------
 
@@ -71,10 +71,6 @@ class SceneViewModel {
 /// All three repository dependencies are injected so the engine is fully
 /// testable without I/O or platform code.
 class ExperienceEngine extends ChangeNotifier {
-  final ContentRepository contentRepository;
-  final TelemetryRepository telemetryRepository;
-  final SessionRepository sessionRepository;
-  final bool enforceMinimumDuration;
 
   ExperienceEngine({
     required this.contentRepository,
@@ -82,6 +78,10 @@ class ExperienceEngine extends ChangeNotifier {
     required this.sessionRepository,
     this.enforceMinimumDuration = true,
   });
+  final ContentRepository contentRepository;
+  final TelemetryRepository telemetryRepository;
+  final SessionRepository sessionRepository;
+  final bool enforceMinimumDuration;
 
   // ---- internal state ------------------------------------------------------
 
@@ -90,10 +90,10 @@ class ExperienceEngine extends ChangeNotifier {
 
   late RouteDefinition _normalRoute;
   late RouteDefinition _fallbackRoute;
-  RouteDefinition _currentRoute = RouteDefinition(
+  RouteDefinition _currentRoute = const RouteDefinition(
     id: 'normal',
     initialState: ExperienceState.ready,
-    transitions: const {},
+    transitions: {},
   );
 
   Map<String, SceneDefinition> _scenes = {};
@@ -149,7 +149,7 @@ class ExperienceEngine extends ChangeNotifier {
     _currentState = ExperienceState.ready;
     _initialized = true;
     notifyListeners();
-    return Ok(null);
+    return const Ok(null);
   }
 
   /// Creates a new session via [SessionRepository] and resets to [ready].

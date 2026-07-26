@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ming_palace/infrastructure/local_content_repository.dart';
+import 'package:ming_palace/infrastructure/project_content_repository.dart';
 import 'package:ming_palace/infrastructure/export_service.dart';
 import 'package:ming_palace/infrastructure/local_telemetry_repository.dart';
 import 'package:ming_palace/infrastructure/local_session_repository.dart';
@@ -16,9 +16,9 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class FakePathProvider extends PathProviderPlatform
     with MockPlatformInterfaceMixin {
-  final Directory tempDir;
 
   FakePathProvider(this.tempDir);
+  final Directory tempDir;
 
   @override
   Future<String> getApplicationDocumentsPath() async => tempDir.path;
@@ -47,12 +47,12 @@ void main() {
   });
 
   group('LocalContentRepository', () {
-    test('loads the bundled, validated 21-scene package', () async {
+    test('loads the bundled, validated 24-phase package', () async {
       final source =
           await File('assets/content/experience.json').readAsString();
-      final result = parseExperienceJson(source);
-      expect(result.isOk, isTrue);
-      expect(result.okValue, hasLength(21));
+      final result = parseProjectExperience(source);
+      expect(result.validate(), isEmpty);
+      expect(result.scenes, hasLength(24));
     });
   });
 

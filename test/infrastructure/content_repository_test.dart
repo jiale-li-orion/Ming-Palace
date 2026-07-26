@@ -2,19 +2,22 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ming_palace/infrastructure/local_content_repository.dart';
+import 'package:ming_palace/infrastructure/project_content_repository.dart';
 
 void main() {
   test('bundled content defines all required states and fields', () {
     final source = File('assets/content/experience.json').readAsStringSync();
-    final result = parseExperienceJson(source);
+    final result = parseProjectExperience(source);
 
-    expect(result.isOk, isTrue);
-    expect(result.okValue, hasLength(21));
-    for (final scene in result.okValue!.values) {
+    expect(result.scenes, hasLength(24));
+    expect(result.validate(), isEmpty);
+    for (final scene in result.scenes.values) {
       expect(scene.id, isNotEmpty);
-      expect(scene.next, isNotEmpty);
-      expect(scene.operatorActions, isNotEmpty);
+      if (scene.id == 'COMPLETED') {
+        expect(scene.next, isEmpty);
+      } else {
+        expect(scene.next, isNotEmpty);
+      }
     }
   });
 
@@ -25,8 +28,9 @@ void main() {
     final scenes = data['scenes'] as Map<String, dynamic>;
     (scenes['READY'] as Map<String, dynamic>).remove('next');
 
-    final result = parseExperienceJson(json.encode(data));
-
-    expect(result.isErr, isTrue);
+    expect(
+      () => parseProjectExperience(json.encode(data)),
+      throwsA(anything),
+    );
   });
 }

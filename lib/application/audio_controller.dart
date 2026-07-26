@@ -19,6 +19,16 @@ import 'package:just_audio/just_audio.dart';
 /// Subscribe to [onCompleted] to trigger auto-advance in the experience
 /// engine when a narration track finishes.
 class AudioController {
+
+  // ---- construction / disposal -------------------------------------------
+
+  AudioController() {
+    _processingSubscription = _player.processingStateStream.listen((state) {
+      if (state == ProcessingState.completed && !_disposed) {
+        _completionController.add(null);
+      }
+    });
+  }
   final AudioPlayer _player = AudioPlayer();
   final StreamController<void> _completionController =
       StreamController<void>.broadcast();
@@ -35,6 +45,7 @@ class AudioController {
 
   /// Stream of playback-state changes (playing, paused, completed, …).
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
+  Stream<Duration> get positionStream => _player.positionStream;
 
   /// Whether audio is currently playing.
   bool get isPlaying => _player.playing;
@@ -47,16 +58,6 @@ class AudioController {
 
   /// Broadcast stream that fires once each time a track finishes playback.
   Stream<void> get onCompleted => _completionController.stream;
-
-  // ---- construction / disposal -------------------------------------------
-
-  AudioController() {
-    _processingSubscription = _player.processingStateStream.listen((state) {
-      if (state == ProcessingState.completed && !_disposed) {
-        _completionController.add(null);
-      }
-    });
-  }
 
   /// Releases all resources.  After calling this the instance must not be
   /// used again.

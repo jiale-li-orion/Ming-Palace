@@ -16,13 +16,6 @@ import 'scene_renderer.dart';
 /// Stationary states show background + "继续" button.
 /// Both show audio controls when an audio asset is assigned.
 class NarrativeRenderer implements SceneRenderer {
-  final void Function(ExperienceEvent) onEvent;
-  final bool isPlaying;
-  final VoidCallback? onPause;
-  final VoidCallback? onResume;
-  final VoidCallback? onReplay;
-  final Duration currentPosition;
-  final Duration duration;
 
   const NarrativeRenderer({
     required this.onEvent,
@@ -33,6 +26,13 @@ class NarrativeRenderer implements SceneRenderer {
     this.currentPosition = Duration.zero,
     this.duration = Duration.zero,
   });
+  final void Function(ExperienceEvent) onEvent;
+  final bool isPlaying;
+  final VoidCallback? onPause;
+  final VoidCallback? onResume;
+  final VoidCallback? onReplay;
+  final Duration currentPosition;
+  final Duration duration;
 
   @override
   Widget build(BuildContext context, SceneViewModel viewModel) {
@@ -59,7 +59,7 @@ class NarrativeRenderer implements SceneRenderer {
           Container(color: AppColors.background),
 
         // Dark overlay for readability
-        Container(color: Colors.black.withOpacity(0.35)),
+        Container(color: Colors.black.withValues(alpha: 0.35)),
 
         // Content
         SafeArea(
@@ -155,8 +155,8 @@ class NarrativeRenderer implements SceneRenderer {
 // ---------------------------------------------------------------------------
 
 class _AudioStatusBar extends StatelessWidget {
-  final bool isPlaying;
   const _AudioStatusBar({required this.isPlaying});
+  final bool isPlaying;
 
   @override
   Widget build(BuildContext context) {
@@ -190,8 +190,8 @@ class _AudioStatusBar extends StatelessWidget {
 }
 
 class _LocationHint extends StatelessWidget {
-  final String text;
   const _LocationHint({required this.text});
+  final String text;
 
   @override
   Widget build(BuildContext context) {
@@ -201,9 +201,9 @@ class _LocationHint extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: AppColors.surface.withOpacity(0.85),
+          color: AppColors.surface.withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

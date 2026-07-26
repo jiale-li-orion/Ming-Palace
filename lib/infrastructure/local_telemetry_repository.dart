@@ -83,7 +83,7 @@ class LocalTelemetryRepository implements TelemetryRepository {
     try {
       final events = await _readEventsForSession(sessionId);
       if (events.isEmpty) {
-        return Err(AppError.telemetryWriteFailed);
+        return const Err(AppError.telemetryWriteFailed);
       }
 
       final startedAt = _parseDateTime(events.first['timestamp'] as String?);
@@ -140,7 +140,7 @@ class LocalTelemetryRepository implements TelemetryRepository {
         survey: survey,
       ));
     } catch (_) {
-      return Err(AppError.telemetryWriteFailed);
+      return const Err(AppError.telemetryWriteFailed);
     }
   }
 
@@ -148,7 +148,7 @@ class LocalTelemetryRepository implements TelemetryRepository {
   Future<Result<List<Map<String, dynamic>>, AppError>> exportAll() async {
     try {
       final file = await _telemetryFile;
-      if (!await file.exists()) return Ok([]);
+      if (!await file.exists()) return const Ok([]);
 
       final lines = await file.readAsLines();
       final events = lines
@@ -157,7 +157,7 @@ class LocalTelemetryRepository implements TelemetryRepository {
           .toList();
       return Ok(events);
     } catch (_) {
-      return Err(AppError.exportFailed);
+      return const Err(AppError.exportFailed);
     }
   }
 
@@ -166,9 +166,9 @@ class LocalTelemetryRepository implements TelemetryRepository {
     try {
       final file = await _telemetryFile;
       if (await file.exists()) await file.delete();
-      return Ok(null);
+      return const Ok(null);
     } catch (_) {
-      return Err(AppError.telemetryWriteFailed);
+      return const Err(AppError.telemetryWriteFailed);
     }
   }
 

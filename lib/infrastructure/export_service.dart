@@ -47,7 +47,7 @@ class ExportService {
 
       return Ok(filePath);
     } catch (_) {
-      return Err(AppError.exportFailed);
+      return const Err(AppError.exportFailed);
     }
   }
 
@@ -55,10 +55,10 @@ class ExportService {
   Future<Result<void, AppError>> shareExport(String filePath) async {
     try {
       final file = XFile(filePath);
-      await Share.shareXFiles([file]);
-      return Ok(null);
+      await SharePlus.instance.share(ShareParams(files: [file]));
+      return const Ok(null);
     } catch (_) {
-      return Err(AppError.exportFailed);
+      return const Err(AppError.exportFailed);
     }
   }
 }

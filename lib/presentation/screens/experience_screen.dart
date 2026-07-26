@@ -35,14 +35,14 @@ import 'error_screen.dart';
 /// Wires audio lifecycle (play on state enter, pause/resume/replay) and
 /// auto-advance timers.  Also provides 7-tap operator-panel access.
 class ExperienceScreen extends StatefulWidget {
-  final ExperienceEngine engine;
-  final AudioController audioController;
 
   const ExperienceScreen({
     required this.engine,
     required this.audioController,
     super.key,
   });
+  final ExperienceEngine engine;
+  final AudioController audioController;
 
   @override
   State<ExperienceScreen> createState() => _ExperienceScreenState();

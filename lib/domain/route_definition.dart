@@ -2,16 +2,16 @@ import 'experience_state.dart';
 
 /// Route configuration loaded from experience.json.
 class RouteDefinition {
-  final String id;
-  final ExperienceState initialState;
-  final Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>>
-      transitions;
 
   const RouteDefinition({
     required this.id,
     required this.initialState,
     required this.transitions,
   });
+  final String id;
+  final ExperienceState initialState;
+  final Map<ExperienceState, Map<ExperienceEventType, ExperienceState?>>
+      transitions;
 
   /// Look up the next state for a given event; returns null if invalid.
   ExperienceState? nextState(

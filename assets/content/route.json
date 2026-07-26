@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "coordinateSystem": "WGS84",
+  "temporary": true,
+  "calibrated": false,
+  "source": "OpenStreetMap/Mapcarta public reference; field validation required",
+  "routes": {
+    "tower": {
+      "polyline": [[32.04199,118.81261],[32.04110,118.81253],[32.04018,118.81245]],
+      "nodes": [{"id":"fengtian_start","latitude":32.04199,"longitude":118.81261,"kind":"start"},{"id":"wumen_north","latitude":32.04018,"longitude":118.81245,"kind":"arrival"},{"id":"wumen_south","latitude":32.03985,"longitude":118.81245,"kind":"ending"}]
+    },
+    "ground": {
+      "polyline": [[32.04199,118.81261],[32.04110,118.81253],[32.04018,118.81245],[32.03985,118.81245]],
+      "nodes": [{"id":"fengtian_start","latitude":32.04199,"longitude":118.81261,"kind":"start"},{"id":"ground_observe","latitude":32.04018,"longitude":118.81245,"kind":"observation"},{"id":"wumen_south","latitude":32.03985,"longitude":118.81245,"kind":"ending"}]
+    }
+  },
+  "defaults": {"maxLocationAgeMs":5000,"maxAccuracyM":20,"arrivalRadiusM":25,"offRouteDistanceM":30,"requiredConsecutiveSamples":3}
+}

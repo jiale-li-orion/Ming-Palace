@@ -17,16 +17,19 @@ import 'package:flutter/material.dart';
 
 /// App-wide colour constants.
 abstract final class AppColors {
-  static const Color primary = Color(0xFF8B0000); // Chinese / Ming red
-  static const Color primaryLight = Color(0xFFB22222); // firebrick
-  static const Color background = Color(0xFF1A1A1A); // near-black
-  static const Color surface = Color(0xFF2D2D2D); // dark card
-  static const Color surfaceVariant = Color(0xFF3A3A3A);
-  static const Color textPrimary = Color(0xFFFFF8E7); // cream
-  static const Color textSecondary = Color(0xFFBDBDBD); // light grey
-  static const Color textDisabled = Color(0xFF757575);
-  static const Color error = Color(0xFFCF6679);
-  static const Color divider = Color(0xFF424242);
+  static const Color primary = Color(0xFFD92121); // 朱砂红
+  static const Color primaryLight = Color(0xFFE65A52);
+  static const Color background = Color(0xFFF5F0E6); // 米白
+  static const Color surface = Color(0xFFFFFCF5);
+  static const Color surfaceVariant = Color(0xFFE9E2D3);
+  static const Color textPrimary = Color(0xFF1A1A1A); // 玄色
+  static const Color textSecondary = Color(0xFF4B4B4B);
+  static const Color textDisabled = Color(0xFF777777);
+  static const Color error = Color(0xFF9E2A2B);
+  static const Color divider = Color(0xFFAAA093);
+  static const Color stoneBlue = Color(0xFF2E5D8C); // 石青
+  static const Color stoneGreen = Color(0xFF57C3C2); // 石绿
+  static const Color safetyYellow = Color(0xFFFFD447);
 }
 
 /// The single [ThemeData] used across the entire app.
@@ -39,17 +42,17 @@ abstract final class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       // ---- colour scheme ---------------------------------------------------
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
-        onPrimary: AppColors.textPrimary,
+        onPrimary: Colors.white,
         secondary: AppColors.primaryLight,
-        onSecondary: AppColors.textPrimary,
+        onSecondary: Colors.white,
         surface: AppColors.surface,
         onSurface: AppColors.textPrimary,
         error: AppColors.error,
-        onError: Colors.black,
+        onError: Colors.white,
         outline: AppColors.divider,
       ),
       scaffoldBackgroundColor: AppColors.background,
@@ -110,7 +113,7 @@ abstract final class AppTheme {
 
       // ---- components ------------------------------------------------------
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.background,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: true,
@@ -120,20 +123,16 @@ abstract final class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.textPrimary,
           minimumSize: const Size(double.infinity, 52),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: const RoundedRectangleBorder(),
           textStyle: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),
       ),
-      cardTheme: CardThemeData(
+      cardTheme: const CardThemeData(
         color: AppColors.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(),
         elevation: 2,
       ),
       dividerTheme: const DividerThemeData(

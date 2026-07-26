@@ -8,14 +8,14 @@ sealed class ExperienceEvent {
 
 /// User tapped a UI action button.
 class UserAction extends ExperienceEvent {
-  final UserActionType action;
   const UserAction(this.action);
+  final UserActionType action;
 }
 
 /// Operator triggered an action from the hidden panel.
 class OperatorAction extends ExperienceEvent {
-  final OperatorActionType action;
   const OperatorAction(this.action);
+  final OperatorActionType action;
 }
 
 /// Audio playback completed.
@@ -30,16 +30,16 @@ class TimerElapsed extends ExperienceEvent {
 
 /// User submitted the five-question post-experience survey.
 class SubmitSurvey extends ExperienceEvent {
-  final SurveyAnswers answers;
 
   const SubmitSurvey(this.answers);
+  final SurveyAnswers answers;
 }
 
 /// App returned from background; contains saved state for recovery.
 class AppResumed extends ExperienceEvent {
+  const AppResumed(this.savedState, this.savedAudioPositionMs);
   final ExperienceState savedState;
   final int savedAudioPositionMs;
-  const AppResumed(this.savedState, this.savedAudioPositionMs);
 }
 
 // --- Action type enums ---

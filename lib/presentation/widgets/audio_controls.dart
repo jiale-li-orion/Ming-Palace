@@ -7,12 +7,6 @@ import '../../app/theme.dart';
 /// Renders a compact row with play/pause toggle, replay, and a thin progress
 /// indicator.  Designed for outdoor tap accuracy — large hit targets.
 class AudioControls extends StatelessWidget {
-  final bool isPlaying;
-  final VoidCallback? onPause;
-  final VoidCallback? onResume;
-  final VoidCallback? onReplay;
-  final Duration currentPosition;
-  final Duration duration;
 
   const AudioControls({
     required this.isPlaying,
@@ -23,6 +17,12 @@ class AudioControls extends StatelessWidget {
     this.duration = Duration.zero,
     super.key,
   });
+  final bool isPlaying;
+  final VoidCallback? onPause;
+  final VoidCallback? onResume;
+  final VoidCallback? onReplay;
+  final Duration currentPosition;
+  final Duration duration;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class AudioControls extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.surface.withOpacity(0.9),
+        color: AppColors.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.divider, width: 0.5),
       ),
@@ -108,15 +108,15 @@ class AudioControls extends StatelessWidget {
 }
 
 class _ControlButton extends StatelessWidget {
-  final IconData icon;
-  final double size;
-  final VoidCallback? onTap;
 
   const _ControlButton({
     required this.icon,
     required this.size,
     this.onTap,
   });
+  final IconData icon;
+  final double size;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +129,7 @@ class _ControlButton extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.12),
+            color: AppColors.primary.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(size / 2),
           ),
           child: Icon(icon, size: size * 0.55, color: AppColors.primaryLight),

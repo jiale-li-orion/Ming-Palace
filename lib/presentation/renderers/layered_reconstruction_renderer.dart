@@ -17,13 +17,13 @@ import 'scene_renderer.dart';
 /// Auto-advance is coordinated by [ExperienceScreen]. This renderer only
 /// owns its visual animations and the minimum-observation countdown.
 class LayeredReconstructionRenderer implements SceneRenderer {
-  final void Function(ExperienceEvent) onEvent;
-  final ValueChanged<String>? onAssetError;
 
   const LayeredReconstructionRenderer({
     required this.onEvent,
     this.onAssetError,
   });
+  final void Function(ExperienceEvent) onEvent;
+  final ValueChanged<String>? onAssetError;
 
   @override
   Widget build(BuildContext context, SceneViewModel viewModel) {
@@ -36,14 +36,14 @@ class LayeredReconstructionRenderer implements SceneRenderer {
 }
 
 class _LayeredView extends StatefulWidget {
-  final SceneViewModel viewModel;
-  final void Function(ExperienceEvent) onEvent;
-  final ValueChanged<String>? onAssetError;
   const _LayeredView({
     required this.viewModel,
     required this.onEvent,
     this.onAssetError,
   });
+  final SceneViewModel viewModel;
+  final void Function(ExperienceEvent) onEvent;
+  final ValueChanged<String>? onAssetError;
 
   @override
   State<_LayeredView> createState() => _LayeredViewState();
@@ -211,7 +211,7 @@ class _LayeredViewState extends State<_LayeredView>
             _reportMissingAsset(layer.asset);
             // Graceful fallback: show a placeholder with the asset name.
             return Container(
-              color: AppColors.surface.withOpacity(0.6),
+              color: AppColors.surface.withValues(alpha: 0.6),
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

@@ -16,14 +16,14 @@ import '../../domain/experience_state.dart';
 /// and the [ExperienceEngine] (for read-only state display), keeping the
 /// controller as the single mutation path to the engine.
 class OperatorPanel extends StatelessWidget {
-  final OperatorController controller;
-  final ExperienceEngine engine;
 
   const OperatorPanel({
     required this.controller,
     required this.engine,
     super.key,
   });
+  final OperatorController controller;
+  final ExperienceEngine engine;
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +41,12 @@ class OperatorPanel extends StatelessWidget {
                 maxHeight: MediaQuery.of(context).size.height * 0.6,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surface.withOpacity(0.97),
+                color: AppColors.surface.withValues(alpha: 0.97),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(16)),
                 border: Border(
                   top: BorderSide(
-                      color: AppColors.primary.withOpacity(0.4), width: 1),
+                      color: AppColors.primary.withValues(alpha: 0.4), width: 1),
                 ),
               ),
               child: SingleChildScrollView(
@@ -56,7 +56,7 @@ class OperatorPanel extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Header
-                    _SectionHeader(title: '操作员面板'),
+                    const _SectionHeader(title: '操作员面板'),
                     const Divider(color: AppColors.divider),
                     const SizedBox(height: 8),
 
@@ -74,7 +74,7 @@ class OperatorPanel extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     // Route toggle
-                    _SectionHeader(title: '路线选择'),
+                    const _SectionHeader(title: '路线选择'),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -110,7 +110,7 @@ class OperatorPanel extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // Navigation
-                    _SectionHeader(title: '导航'),
+                    const _SectionHeader(title: '导航'),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -133,7 +133,7 @@ class OperatorPanel extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<ExperienceState>(
-                      value: engine.currentState,
+                      initialValue: engine.currentState,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         labelText: '跳转到指定状态',
@@ -179,7 +179,7 @@ class OperatorPanel extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // Session
-                    _SectionHeader(title: '会话'),
+                    const _SectionHeader(title: '会话'),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -229,7 +229,7 @@ class OperatorPanel extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // Data
-                    _SectionHeader(title: '数据'),
+                    const _SectionHeader(title: '数据'),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -301,8 +301,8 @@ class OperatorPanel extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _SectionHeader extends StatelessWidget {
-  final String title;
   const _SectionHeader({required this.title});
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -317,9 +317,9 @@ class _SectionHeader extends StatelessWidget {
 }
 
 class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.label, required this.value});
   final String label;
   final String value;
-  const _InfoRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -344,11 +344,6 @@ class _InfoRow extends StatelessWidget {
 }
 
 class _SmallButton extends StatelessWidget {
-  final String label;
-  final IconData? icon;
-  final VoidCallback? onTap;
-  final bool selected;
-  final Color? color;
 
   const _SmallButton({
     required this.label,
@@ -357,11 +352,16 @@ class _SmallButton extends StatelessWidget {
     this.selected = false,
     this.color,
   });
+  final String label;
+  final IconData? icon;
+  final VoidCallback? onTap;
+  final bool selected;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     final bgColor = selected
-        ? (color ?? AppColors.primary).withOpacity(0.2)
+        ? (color ?? AppColors.primary).withValues(alpha: 0.2)
         : AppColors.surfaceVariant;
     final borderColor =
         selected ? (color ?? AppColors.primaryLight) : AppColors.divider;

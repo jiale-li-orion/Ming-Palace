@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "contentVersion": "0.2.0",
+  "categories": {
+    "A": {"name":"核心史实","description":"有核心事实或较硬证据支撑的历史骨架"},
+    "B": {"name":"史料综合","description":"由多项材料、解释传统或受控综合形成"},
+    "C": {"name":"空间叙事","description":"连接今日地点、游客动作和人物关系"}
+  },
+  "entries": [
+    {"id":"E-A-001","category":"A","summary":"明故宫外朝建筑沿宫城中轴组织。","source":"《精游·明故宫完整台词工作稿》史实层","index":"A-001"},
+    {"id":"E-A-002","category":"A","summary":"奉天门、内五龙桥与午门沿御道相连。","source":"《精游·明故宫完整台词工作稿》史实层","index":"A-002"},
+    {"id":"E-A-003","category":"A","summary":"午门是南京明故宫宫城正门。","source":"《精游·明故宫完整台词工作稿》史实层","index":"A-003"},
+    {"id":"E-A-004","category":"A","summary":"奉天殿、奉天门及文武楼构成外朝空间骨架。","source":"《精游·明故宫完整台词工作稿》史实层","index":"A-004"},
+    {"id":"E-B-001","category":"B","summary":"复原画面综合文献、遗址关系和受控艺术表达。","source":"视觉资产与现场测试手册0725","index":"B-001"},
+    {"id":"E-B-002","category":"B","summary":"画面表达空间关系，不主张像素级精确复原。","source":"在原精游·产品宪法","index":"B-002"},
+    {"id":"E-B-003","category":"B","summary":"削藩动机按现有史料综合塑造，不作为直接引语。","source":"《精游·明故宫完整台词工作稿》产品注","index":"B-003"},
+    {"id":"E-C-001","category":"C","summary":"用当前位置连接已消失的宫城中轴。","source":"在原精游·产品宪法","index":"C-001"},
+    {"id":"E-C-002","category":"C","summary":"行走指令属于现场空间叙事。","source":"在原精游·产品宪法","index":"C-002"},
+    {"id":"E-C-003","category":"C","summary":"绘画化想象用于帮助观察现实，不替代现实。","source":"在原精游·产品宪法","index":"C-003"},
+    {"id":"E-C-004","category":"C","summary":"地面路线使用独立固定视点，不模拟城台高度。","source":"Project.md 4.3","index":"C-004"},
+    {"id":"E-C-005","category":"C","summary":"结尾保持历史去向的不确定性。","source":"《精游·明故宫完整台词工作稿》结尾段","index":"C-005"}
+  ]
+}

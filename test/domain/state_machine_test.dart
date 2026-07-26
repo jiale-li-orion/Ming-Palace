@@ -67,12 +67,12 @@ void main() {
 
   group('ExperienceEvent', () {
     test('UserAction carries correct ActionType', () {
-      final event = UserAction(UserActionType.continue_);
+      const event = UserAction(UserActionType.continue_);
       expect(event.action, UserActionType.continue_);
     });
 
     test('OperatorAction carries correct ActionType', () {
-      final event = OperatorAction(OperatorActionType.nextStep);
+      const event = OperatorAction(OperatorActionType.nextStep);
       expect(event.action, OperatorActionType.nextStep);
     });
 
@@ -464,7 +464,7 @@ void main() {
     });
 
     test('hasLayers returns true only for multiple layers', () {
-      final single = SceneDefinition(
+      const single = SceneDefinition(
         id: 'test',
         renderer: 'narrative',
         minimumDurationMs: 0,
@@ -475,7 +475,7 @@ void main() {
       );
       expect(single.hasLayers, isFalse);
 
-      final multi = SceneDefinition(
+      const multi = SceneDefinition(
         id: 'test',
         renderer: 'layered_reconstruction',
         minimumDurationMs: 0,
@@ -491,7 +491,7 @@ void main() {
     });
 
     test('allowsAction checks correctly', () {
-      final scene = SceneDefinition(
+      const scene = SceneDefinition(
         id: 'test',
         renderer: 'narrative',
         minimumDurationMs: 0,
@@ -508,7 +508,7 @@ void main() {
     });
 
     test('toJson roundtrip', () {
-      final original = SceneDefinition(
+      const original = SceneDefinition(
         id: 'TEST',
         renderer: 'layered_reconstruction',
         background: 'images/test/bg.webp',
@@ -548,7 +548,7 @@ void main() {
         questionChoice: 'feudal_princes',
         helpCount: 1,
         interrupted: false,
-        survey: SurveyAnswers(
+        survey: const SurveyAnswers(
           experienceDescription: 'walking with Zhu Yunwen',
           mostEngagingMoment: 'platform narration',
           confusingMoment: 'none',
@@ -563,7 +563,8 @@ void main() {
       expect(json['completed'], true);
       expect(json['route'], 'normal');
       expect(json['questionChoice'], 'feudal_princes');
-      expect(json['survey']['wantsLongerExperience'], true);
+      final survey = json['survey'] as Map<String, dynamic>;
+      expect(survey['wantsLongerExperience'], true);
     });
 
     test('serializes without survey', () {
@@ -586,7 +587,7 @@ void main() {
 
   group('Result type', () {
     test('Ok returns value', () {
-      final result = Ok<int, AppError>(42);
+      const result = Ok<int, AppError>(42);
       expect(result.isOk, isTrue);
       expect(result.isErr, isFalse);
       expect(result.okValue, 42);
@@ -594,7 +595,7 @@ void main() {
     });
 
     test('Err returns error', () {
-      final result = Err<int, AppError>(AppError.contentLoadFailed);
+      const result = Err<int, AppError>(AppError.contentLoadFailed);
       expect(result.isOk, isFalse);
       expect(result.isErr, isTrue);
       expect(result.okValue, isNull);
@@ -602,8 +603,8 @@ void main() {
     });
 
     test('fold dispatches correctly', () {
-      final ok = Ok<int, AppError>(5);
-      final err = Err<int, AppError>(AppError.unknown);
+      const ok = Ok<int, AppError>(5);
+      const err = Err<int, AppError>(AppError.unknown);
 
       expect(ok.fold((v) => '$v', (e) => 'err'), '5');
       expect(err.fold((v) => '$v', (e) => 'err'), 'err');
@@ -638,7 +639,7 @@ void main() {
     });
 
     test('toJson roundtrip', () {
-      final layer =
+      const layer =
           VisualLayer(asset: 'test.webp', startMs: 500, fadeInMs: 200);
       final json = layer.toJson();
       final parsed = VisualLayer.fromJson(json);

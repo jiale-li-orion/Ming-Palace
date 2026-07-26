@@ -3,46 +3,6 @@
 /// Each scene maps to one [ExperienceState] and defines what the renderer,
 /// audio, visuals, and allowed actions are for that state.
 class SceneDefinition {
-  static const supportedRenderers = {
-    'instruction',
-    'narrative',
-    'layered_reconstruction',
-    'question',
-    'survey',
-    'safety',
-    'completed',
-  };
-  static const supportedActions = {
-    'start_test',
-    'continue',
-    'pause',
-    'resume',
-    'replay',
-    'arrived',
-    'choose_feudal',
-    'choose_classics',
-    'submit_survey',
-    'export',
-    'restart',
-  };
-  static const supportedSafetyModes = {
-    'stationary',
-    'walking',
-    'ascending',
-    'descending',
-  };
-
-  final String id;
-  final String renderer;
-  final String? background;
-  final String? audio;
-  final int minimumDurationMs;
-  final bool autoAdvance;
-  final List<VisualLayer> visualSequence;
-  final List<String> allowedActions;
-  final List<String> next;
-  final List<String> operatorActions;
-  final String safetyMode;
 
   const SceneDefinition({
     required this.id,
@@ -108,6 +68,46 @@ class SceneDefinition {
       safetyMode: safetyMode,
     );
   }
+  static const supportedRenderers = {
+    'instruction',
+    'narrative',
+    'layered_reconstruction',
+    'question',
+    'survey',
+    'safety',
+    'completed',
+  };
+  static const supportedActions = {
+    'start_test',
+    'continue',
+    'pause',
+    'resume',
+    'replay',
+    'arrived',
+    'choose_feudal',
+    'choose_classics',
+    'submit_survey',
+    'export',
+    'restart',
+  };
+  static const supportedSafetyModes = {
+    'stationary',
+    'walking',
+    'ascending',
+    'descending',
+  };
+
+  final String id;
+  final String renderer;
+  final String? background;
+  final String? audio;
+  final int minimumDurationMs;
+  final bool autoAdvance;
+  final List<VisualLayer> visualSequence;
+  final List<String> allowedActions;
+  final List<String> next;
+  final List<String> operatorActions;
+  final String safetyMode;
 
   Map<String, dynamic> toJson() => {
         'renderer': renderer,
@@ -131,9 +131,6 @@ class SceneDefinition {
 
 /// A single visual layer in a layered reconstruction scene.
 class VisualLayer {
-  final String asset;
-  final int startMs;
-  final int fadeInMs;
 
   const VisualLayer({
     required this.asset,
@@ -157,6 +154,9 @@ class VisualLayer {
       fadeInMs: fadeInMs,
     );
   }
+  final String asset;
+  final int startMs;
+  final int fadeInMs;
 
   Map<String, dynamic> toJson() => {
         'asset': asset,

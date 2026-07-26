@@ -4,14 +4,14 @@ import '../../app/theme.dart';
 
 /// Explicit recovery gate shown before replacing an unfinished local session.
 class ResumePrompt extends StatelessWidget {
-  final VoidCallback onResume;
-  final VoidCallback onDiscard;
 
   const ResumePrompt({
     required this.onResume,
     required this.onDiscard,
     super.key,
   });
+  final VoidCallback onResume;
+  final VoidCallback onDiscard;
 
   @override
   Widget build(BuildContext context) {

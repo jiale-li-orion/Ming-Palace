@@ -15,9 +15,9 @@ import 'scene_renderer.dart';
 /// 4. "是否愿意体验30-45分钟完整版？" — Yes/No toggle
 /// 5. "是否愿意参加下一轮测试？" — Yes/No toggle
 class SurveyRenderer implements SceneRenderer {
-  final void Function(ExperienceEvent) onEvent;
 
   const SurveyRenderer({required this.onEvent});
+  final void Function(ExperienceEvent) onEvent;
 
   @override
   Widget build(BuildContext context, SceneViewModel viewModel) {
@@ -28,8 +28,8 @@ class SurveyRenderer implements SceneRenderer {
 }
 
 class _SurveyForm extends StatefulWidget {
-  final ValueChanged<SurveyAnswers> onSubmit;
   const _SurveyForm({required this.onSubmit});
+  final ValueChanged<SurveyAnswers> onSubmit;
 
   @override
   State<_SurveyForm> createState() => _SurveyFormState();
@@ -71,7 +71,7 @@ class _SurveyFormState extends State<_SurveyForm> {
             const SizedBox(height: 32),
 
             // Q1
-            _QuestionLabel(number: 1, text: '你认为刚才体验的是什么？'),
+            const _QuestionLabel(number: 1, text: '你认为刚才体验的是什么？'),
             const SizedBox(height: 10),
             TextField(
               controller: _q1Controller,
@@ -82,7 +82,7 @@ class _SurveyFormState extends State<_SurveyForm> {
             const SizedBox(height: 24),
 
             // Q2
-            _QuestionLabel(number: 2, text: '哪一刻最吸引你？'),
+            const _QuestionLabel(number: 2, text: '哪一刻最吸引你？'),
             const SizedBox(height: 10),
             TextField(
               controller: _q2Controller,
@@ -93,7 +93,7 @@ class _SurveyFormState extends State<_SurveyForm> {
             const SizedBox(height: 24),
 
             // Q3
-            _QuestionLabel(number: 3, text: '哪一刻最难理解或开始走神？'),
+            const _QuestionLabel(number: 3, text: '哪一刻最难理解或开始走神？'),
             const SizedBox(height: 10),
             TextField(
               controller: _q3Controller,
@@ -104,7 +104,7 @@ class _SurveyFormState extends State<_SurveyForm> {
             const SizedBox(height: 24),
 
             // Q4: Yes/No toggle
-            _QuestionLabel(number: 4, text: '是否愿意体验30-45分钟完整版？'),
+            const _QuestionLabel(number: 4, text: '是否愿意体验30-45分钟完整版？'),
             const SizedBox(height: 10),
             _YesNoToggle(
                 value: _q4Answer,
@@ -114,7 +114,7 @@ class _SurveyFormState extends State<_SurveyForm> {
             const SizedBox(height: 24),
 
             // Q5: Yes/No toggle
-            _QuestionLabel(number: 5, text: '是否愿意参加下一轮测试？'),
+            const _QuestionLabel(number: 5, text: '是否愿意参加下一轮测试？'),
             const SizedBox(height: 10),
             _YesNoToggle(
                 value: _q5Answer,
@@ -152,7 +152,7 @@ class _SurveyFormState extends State<_SurveyForm> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: AppColors.textDisabled.withOpacity(0.6)),
+      hintStyle: TextStyle(color: AppColors.textDisabled.withValues(alpha: 0.6)),
       filled: true,
       fillColor: AppColors.surfaceVariant,
       border: OutlineInputBorder(
@@ -169,9 +169,9 @@ class _SurveyFormState extends State<_SurveyForm> {
 }
 
 class _QuestionLabel extends StatelessWidget {
+  const _QuestionLabel({required this.number, required this.text});
   final int number;
   final String text;
-  const _QuestionLabel({required this.number, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -208,9 +208,9 @@ class _QuestionLabel extends StatelessWidget {
 }
 
 class _YesNoToggle extends StatelessWidget {
+  const _YesNoToggle({required this.value, required this.onChanged});
   final bool value;
   final ValueChanged<bool> onChanged;
-  const _YesNoToggle({required this.value, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -237,14 +237,14 @@ class _YesNoToggle extends StatelessWidget {
 }
 
 class _ToggleButton extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
   const _ToggleButton({
     required this.label,
     required this.selected,
     required this.onTap,
   });
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {

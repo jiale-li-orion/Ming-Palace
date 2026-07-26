@@ -11,9 +11,9 @@ import 'scene_renderer.dart';
 /// Only a large centered safety prompt and a direction hint.
 /// "我已到达" button at the bottom advances the experience.
 class SafetyRenderer implements SceneRenderer {
-  final void Function(ExperienceEvent) onEvent;
 
   const SafetyRenderer({required this.onEvent});
+  final void Function(ExperienceEvent) onEvent;
 
   @override
   Widget build(BuildContext context, SceneViewModel viewModel) {
@@ -35,7 +35,7 @@ class SafetyRenderer implements SceneRenderer {
                     Icon(
                       icon,
                       size: 64,
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                     ),
                     const SizedBox(height: 24),
                     Text(

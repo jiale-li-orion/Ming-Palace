@@ -51,7 +51,7 @@ class LocalSessionRepository implements SessionRepository {
       _currentSessionId = sessionId;
       return Ok(sessionId);
     } catch (_) {
-      return Err(AppError.sessionCreationFailed);
+      return const Err(AppError.sessionCreationFailed);
     }
   }
 
@@ -59,7 +59,7 @@ class LocalSessionRepository implements SessionRepository {
   Future<Result<Map<String, dynamic>?, AppError>> loadSavedState() async {
     try {
       final file = await _stateFile;
-      if (!await file.exists()) return Ok(null);
+      if (!await file.exists()) return const Ok(null);
 
       final content = await file.readAsString();
       final decoded = json.decode(content) as Map<String, dynamic>;
@@ -67,7 +67,7 @@ class LocalSessionRepository implements SessionRepository {
       return Ok(decoded);
     } catch (_) {
       // Corrupted or unreadable state → treat as no saved state.
-      return Ok(null);
+      return const Ok(null);
     }
   }
 
@@ -85,7 +85,7 @@ class LocalSessionRepository implements SessionRepository {
         _currentSessionId = existing.okValue?['sessionId'] as String?;
       }
       if (_currentSessionId == null || _currentSessionId!.isEmpty) {
-        return Err(AppError.sessionCreationFailed);
+        return const Err(AppError.sessionCreationFailed);
       }
 
       final stateData = <String, dynamic>{
@@ -99,9 +99,9 @@ class LocalSessionRepository implements SessionRepository {
 
       final file = await _stateFile;
       await file.writeAsString(json.encode(stateData));
-      return Ok(null);
+      return const Ok(null);
     } catch (_) {
-      return Err(AppError.unknown);
+      return const Err(AppError.unknown);
     }
   }
 
@@ -110,9 +110,9 @@ class LocalSessionRepository implements SessionRepository {
     try {
       final file = await _stateFile;
       if (await file.exists()) await file.delete();
-      return Ok(null);
+      return const Ok(null);
     } catch (_) {
-      return Err(AppError.unknown);
+      return const Err(AppError.unknown);
     }
   }
 

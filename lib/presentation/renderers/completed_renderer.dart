@@ -9,10 +9,6 @@ import 'scene_renderer.dart';
 ///
 /// Shows a session-end summary with export and restart options.
 class CompletedRenderer implements SceneRenderer {
-  final void Function(ExperienceEvent) onEvent;
-  final String? routeName;
-  final String? questionChoice;
-  final String? sessionId;
 
   const CompletedRenderer({
     required this.onEvent,
@@ -20,6 +16,10 @@ class CompletedRenderer implements SceneRenderer {
     this.questionChoice,
     this.sessionId,
   });
+  final void Function(ExperienceEvent) onEvent;
+  final String? routeName;
+  final String? questionChoice;
+  final String? sessionId;
 
   @override
   Widget build(BuildContext context, SceneViewModel viewModel) {
@@ -35,7 +35,7 @@ class CompletedRenderer implements SceneRenderer {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.15),
+                color: AppColors.primary.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -102,9 +102,9 @@ class CompletedRenderer implements SceneRenderer {
 }
 
 class _SummaryRow extends StatelessWidget {
+  const _SummaryRow({required this.label, required this.value});
   final String label;
   final String value;
-  const _SummaryRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {

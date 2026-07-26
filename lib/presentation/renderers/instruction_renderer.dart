@@ -13,9 +13,9 @@ import 'scene_renderer.dart';
 /// - **WAIT_FOR_ROUTE_DECISION**: operator-only route selection screen
 ///   (normal ascend vs. fallback ground-level).
 class InstructionRenderer implements SceneRenderer {
-  final void Function(ExperienceEvent) onEvent;
 
   const InstructionRenderer({required this.onEvent});
+  final void Function(ExperienceEvent) onEvent;
 
   @override
   Widget build(BuildContext context, SceneViewModel viewModel) {
@@ -38,8 +38,8 @@ class InstructionRenderer implements SceneRenderer {
 // ---------------------------------------------------------------------------
 
 class _WelcomeScreen extends StatelessWidget {
-  final VoidCallback onStartTest;
   const _WelcomeScreen({required this.onStartTest});
+  final VoidCallback onStartTest;
 
   @override
   Widget build(BuildContext context) {
@@ -70,13 +70,13 @@ class _WelcomeScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
-            _InfoRow(icon: Icons.timer_outlined, text: '体验约6-8分钟'),
+            const _InfoRow(icon: Icons.timer_outlined, text: '体验约6-8分钟'),
             const SizedBox(height: 12),
-            _InfoRow(icon: Icons.directions_walk_rounded, text: '需要步行和登楼'),
+            const _InfoRow(icon: Icons.directions_walk_rounded, text: '需要步行和登楼'),
             const SizedBox(height: 12),
-            _InfoRow(icon: Icons.headphones_rounded, text: '建议佩戴耳机'),
+            const _InfoRow(icon: Icons.headphones_rounded, text: '建议佩戴耳机'),
             const SizedBox(height: 12),
-            _InfoRow(icon: Icons.warning_amber_rounded, text: '注意脚下安全'),
+            const _InfoRow(icon: Icons.warning_amber_rounded, text: '注意脚下安全'),
             const Spacer(),
             SizedBox(
               width: double.infinity,
@@ -95,9 +95,9 @@ class _WelcomeScreen extends StatelessWidget {
 }
 
 class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.icon, required this.text});
   final IconData icon;
   final String text;
-  const _InfoRow({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -116,8 +116,8 @@ class _InfoRow extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _RouteDecisionScreen extends StatelessWidget {
-  final void Function(ExperienceEvent) onEvent;
   const _RouteDecisionScreen({required this.onEvent});
+  final void Function(ExperienceEvent) onEvent;
 
   @override
   Widget build(BuildContext context) {
@@ -160,10 +160,6 @@ class _RouteDecisionScreen extends StatelessWidget {
 }
 
 class _RouteCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final VoidCallback onTap;
 
   const _RouteCard({
     required this.title,
@@ -171,6 +167,10 @@ class _RouteCard extends StatelessWidget {
     required this.icon,
     required this.onTap,
   });
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +189,7 @@ class _RouteCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.15),
+                    color: AppColors.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(icon, color: AppColors.primary, size: 28),
