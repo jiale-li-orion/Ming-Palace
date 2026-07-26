@@ -24,6 +24,7 @@ Top-level structure:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| `id` | string | yes | 必须与外层 `<STATE_ID>` 完全一致，使用大写蛇形命名 |
 | `renderer` | string | yes | Renderer type: `instruction`, `narrative`, `layered_reconstruction`, `question`, `survey`, `safety`, `completed` |
 | `background` | string? | no | Asset path for background image |
 | `audio` | string? | no | Asset path for audio file |
@@ -31,6 +32,8 @@ Top-level structure:
 | `autoAdvance` | bool | yes | Whether timer auto-advances |
 | `visualSequence` | array | yes | List of VisualLayer objects |
 | `allowedActions` | array | yes | List of action names the user can trigger |
+| `next` | array | yes | 允许的后继状态 ID；实际转换由 Experience Engine 校验 |
+| `operatorActions` | array | yes | 当前状态允许呈现的操作员动作 |
 | `safetyMode` | string | yes | `stationary`, `walking`, `ascending`, `descending` |
 
 ### VisualLayer

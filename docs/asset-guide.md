@@ -86,7 +86,7 @@ Evidence index: `assets/content/evidence/evidence-index.json`
 ## Placeholder policy
 
 Until production assets arrive:
-- Each image slot has a 1-pixel colored PNG placeholder
+- Each image slot is a native 1080×1920 sRGB WebP under 2 MB, visibly marked `PLACEHOLDER`, with 12% safe-area guides
 - Audio slots have no files (app shows error for missing audio)
 - All placeholders are visually distinct and labeled
 - Missing assets show asset name + "[PLACEHOLDER]" in app, never crash

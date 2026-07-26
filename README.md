@@ -1,198 +1,58 @@
-# 明故宫 · 在场叙事体验 Ming Palace On-Site Narrative Demo
+# 明故宫 · 朱允炆在场叙事 Demo
 
-> 朱允炆：建文四年不是空白 — First-person historical narrative at Nanjing Ming Palace Ruins
+Android 优先、完全离线的 Flutter 现场叙事 Demo。用户沿南京明故宫遗址固定路线行走，通过朱允炆第一人称音频、固定视点分层复原、一次二选一互动和现场问卷完成约 6—8 分钟体验。完整需求见 [Project.md](Project.md)。
 
-An Android app that guides users through the Ming Palace Ruins (明故宫遗址, Nanjing) with first-person narration from Zhu Yunwen (建文帝). Pre-shot photos overlaid with painting-style historical reconstruction layers replace the vanished palace architecture.
+## 当前实现
 
-## Quick start
+- 21 状态集中式状态机，覆盖正常登楼路线与地面替代路线。
+- 本地 `experience.json` 严格校验；配置错误显示可恢复错误页。
+- 分段本地音频支持播放、暂停、继续、重播、位置保存；缺音频时提示并允许继续。
+- 固定视点 WebP 分层淡入；观察节点含 10 秒倒计时。
+- 应用进入后台时暂停并保存；被终止后下次启动可选择恢复或放弃。
+- 问卷、JSONL 遥测、当前会话/全部日志导出。
+- 首页标题连续点击 7 次打开操作员面板，可跳转、回退、标记帮助、重播、查看/导出/清空日志和结束会话。
 
-### Prerequisites
+## 环境与构建
 
-- Flutter SDK (≥ 3.10.0, Dart ≥ 3.0.0)
-- Android phone or emulator (Android 8.0+ / API 26+)
-- USB cable for deployment or APK
-
-### Build & install
+- 已验证 Flutter `3.44.8`、Dart `3.12.2`
+- Android 最低 API 26（Android 8.0）
 
 ```bash
-# Clone
-git clone https://github.com/jiale-li-orion/Ming-Palace.git
-cd Ming-Palace
-
-# Get dependencies
 flutter pub get
-
-# Run on connected device
-flutter run
-
-# Build release APK
-flutter build apk --release
+flutter analyze
+flutter test
+flutter build apk --debug
 ```
 
-### Run tests
+Debug APK 输出到 `build/app/outputs/flutter-apk/app-debug.apk`。连接目标手机后可运行：
 
 ```bash
-# Unit tests (domain model, state machine, repositories)
-flutter test
-
-# Integration tests (full user flow)
-flutter test integration_test/
+flutter devices
+flutter run
 ```
 
-## Routes
+若本机代理指向本地端口，Flutter 测试进程无法访问回环地址，可临时执行：
 
-### Normal route (6–8 minutes)
-
-Walk from 奉天门北 → 午门 → ascend the 午门 city gate → observe the layered reconstruction northward → hear Zhu Yunwen's narration → answer one question → descend → walk out through 午门 → ending.
-
-### Fallback route (alternative)
-
-Same start, but when 午门 is closed or conditions prevent climbing → ground-level observation → shorter reconstruction → same question → ending.
-
-Triggered by operator panel "切换替代路线" button. Must be selected at `WAIT_FOR_ROUTE_DECISION` state.
-
-## Project structure
-
-```
-lib/
-├── main.dart                          # Entry point
-├── app/
-│   ├── app.dart                       # MaterialApp root widget
-│   ├── router.dart                    # State-driven routing (doc only)
-│   └── theme.dart                     # Dark theme, Chinese red accent
-├── application/
-│   ├── experience_controller.dart     # Central state machine engine
-│   ├── audio_controller.dart          # Audio playback (just_audio)
-│   └── operator_controller.dart       # Hidden operator panel logic
-├── domain/
-│   ├── experience_state.dart          # 21-state enum
-│   ├── experience_event.dart          # Event types + action enums
-│   ├── scene_definition.dart          # Scene + visual layer models
-│   ├── route_definition.dart          # Normal + fallback transition tables
-│   └── session_summary.dart           # Test session data model
-├── infrastructure/
-│   ├── local_content_repository.dart   # Load experience.json
-│   ├── local_telemetry_repository.dart # JSONL event logging
-│   ├── local_session_repository.dart   # Session + state persistence
-│   └── export_service.dart            # Data export + share
-├── presentation/
-│   ├── screens/
-│   │   ├── experience_screen.dart     # Main screen wiring
-│   │   └── error_screen.dart          # Load failure UI
-│   ├── renderers/
-│   │   ├── scene_renderer.dart        # Renderer interface
-│   │   ├── instruction_renderer.dart   # Welcome + route decision
-│   │   ├── narrative_renderer.dart     # Walking + stationary narrative
-│   │   ├── layered_reconstruction_renderer.dart  # Historical overlay
-│   │   ├── question_renderer.dart      # 2-choice interaction
-│   │   ├── survey_renderer.dart        # Post-experience survey
-│   │   ├── safety_renderer.dart        # Ascend/descend safety
-│   │   └── completed_renderer.dart     # End screen + export
-│   ├── widgets/
-│   │   └── audio_controls.dart        # Reusable audio bar
-│   └── operator/
-│       └── operator_panel.dart        # Hidden operator panel
-└── shared/
-    ├── result.dart                    # Result<T, E> type
-    └── app_error.dart                 # Error codes
+```bash
+env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy \
+  NO_PROXY=localhost,127.0.0.1,::1 \
+  no_proxy=localhost,127.0.0.1,::1 flutter test
 ```
 
-## Content management
+## 内容与素材替换
 
-Content is fully offline, loaded from `assets/content/experience.json` at startup.
+配置入口是 `assets/content/experience.json`，状态 ID、Renderer、动作、后继状态和时长字段见 [内容 Schema](docs/content-schema.md)。状态转换仍以 `lib/domain/route_definition.dart` 为唯一执行入口。
 
-### Replacing assets
+图片必须为 1080×1920、sRGB、单张不超过 2 MB，并保留上下各 12% 安全区。当前图片均为明确标有 `PLACEHOLDER` 的联调资源，不是史实复原完成稿。正式素材到位后保持原文件名覆盖即可，清单见 [素材指南](docs/asset-guide.md)。
 
-| Directory | Contents |
-|-----------|----------|
-| `assets/audio/` | MP3 narration files, named per experience.json |
-| `assets/images/fengtian_north/` | 奉天门北 scene background |
-| `assets/images/platform_north/` | 午门城台北望 — background + 5 overlay layers |
-| `assets/images/ground_fallback/` | Fallback route background + 2 overlay layers |
-| `assets/images/wumen_south/` | 午门南 ending background |
-| `assets/content/experience.json` | Scene definitions, transitions, asset mapping |
+正式 MP3 尚未入库。应用会记录 `audio_load_failed` 并显示“音频暂缺，可继续体验”，因此流程可验收，但“所有正式音频可播放”仍需素材交付后复验。
 
-### Asset specs
+## 数据与隐私
 
-| Parameter | Requirement |
-|-----------|-------------|
-| Format | WebP or PNG |
-| Resolution | 1080 × 1920 (full-screen mobile portrait) |
-| Color space | sRGB |
-| Max file size | ≤ 2 MB per image |
-| Clearance | 12% top, 12% bottom (system bars / subtitles / UI) |
+事件逐行写入应用文档目录的 `telemetry.jsonl`，不上传服务器。完成页导出当前会话，操作员面板可查看最近日志或导出全部日志。字段见 [遥测 Schema](docs/telemetry-schema.md)。
 
-See `docs/asset-guide.md` for the full asset inventory.
+## 验证范围
 
-### Modifying the script
+自动测试覆盖两条路线、非法转换、分支合流、内容解析、会话恢复、JSONL、问卷和关键页面。集成测试覆盖两条完整状态路径。户外直射光、后台中断、连续 10 次运行、分享面板和安装包安装必须在目标 Android 手机上执行，见 [手工验收表](docs/manual-acceptance.md)。
 
-Edit `assets/content/experience.json` scene configurations. Audio files must match the `audio` field paths. The state machine flow is defined in `lib/domain/route_definition.dart`.
-
-## State machine
-
-21 states, normal and fallback routes, all transitions defined in pure Dart. See `docs/content-schema.md`.
-
-## Telemetry
-
-All events logged to `telemetry.jsonl` in the app's documents directory. Export via the operator panel or the end screen. Full schema in `docs/telemetry-schema.md`.
-
-## Tests
-
-| Test file | Coverage |
-|-----------|----------|
-| `test/domain/state_machine_test.dart` | State transitions, route logic, model parsing |
-| `test/infrastructure/repository_test.dart` | JSONL telemetry, session persistence |
-| `test/presentation/` | Widget tests (when Flutter SDK available) |
-| `integration_test/experience_test.dart` | Full user flow end-to-end |
-
-## Operator panel
-
-Revealed by tapping the title "明故宫 · 朱允炆" 7 times. Provides:
-
-- Session control: create, reset, navigate states
-- Route switching: normal ↔ fallback
-- Debug: replay audio, view/export logs, clear data
-- Mark user "needs help"
-
-All operator actions are logged to telemetry.
-
-## Known limitations
-
-- **Flutter SDK installation**: The current development network is unable to download Flutter SDK (Google CDN, Gitee mirror, and snap all time out at ~20 KB/s). All code is written to spec; verify and run tests once Flutter is available (try a VPN, different network, or `sudo snap install flutter --classic`).
-- **Production assets**: All image slots currently have 1-pixel PNG placeholders. Replace with real production assets before field testing.
-- **Audio files**: No MP3 files yet. Placeholder READMEs in `assets/audio/`. The app handles missing audio gracefully (shows error, logs event, allows skip).
-- **Single device target**: Android only. Not tested on iOS.
-- **No GPS or AR**: Manual progression only.
-
-## What this project does NOT do
-
-Per `Project.md` §14, this version explicitly does NOT implement:
-- Login, accounts, payments, registration
-- Cloud database, CMS, real-time upload
-- GPS auto-triggering or map display
-- Real-time camera overlay
-- AR or 3D models
-- Free-text conversation, LLM, RAG
-- Voice recognition or TTS
-- Multi-character or multi-route stories
-- iOS support
-- App store deployment
-- Remote content updates
-
-## Architecture decisions
-
-- **State machine**: Pure Dart `ChangeNotifier` (no Riverpod/Bloc/GetX)
-- **Audio**: `just_audio` — plays MP3 from assets, handles lifecycle
-- **Content**: Static `experience.json` asset (no network)
-- **Telemetry**: JSONL file, appended per event
-- **UI**: Single-screen, state-driven renderer switching
-
-## Docs
-
-- `docs/content-schema.md` — Scene configuration format
-- `docs/telemetry-schema.md` — Event log format
-- `docs/asset-guide.md` — Asset production specs
-
-## License
-
-Internal development prototype. Not for distribution.
+本版本不实现 GPS、地图、实时相机、AR/3D、账号、后端、云上传、语音识别、LLM 或远程内容更新。
