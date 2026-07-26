@@ -419,20 +419,20 @@ class _NarrationPanel extends StatelessWidget {
   }
 
   static String _subtitle(ExperiencePhase phase) => switch (phase) {
-        ExperiencePhase.fengtianStart => '你站着的地方，曾经是宫城最重要的轴线。',
-        ExperiencePhase.walkToWumen => '沿着御道向南走。稳定行走时，导航会暂时退场。',
+        ExperiencePhase.fengtianStart => '你现在站的地方，从前在我的宫城里。',
+        ExperiencePhase.walkToWumen => '沿着宫城正中的御道向南走。稳定行走时，导航会暂时退场。',
         ExperiencePhase.wumenApproach => '已经接近午门。请对照眼前城台，确认位置。',
         ExperiencePhase.wumenArrival => '你似乎已经到达。确认后，体验才会继续。',
         ExperiencePhase.platformArrival => '请先站稳，再将手机转为横屏。',
         ExperiencePhase.platformObserve => '先看今天留下来的空间。轻触画面可隐藏界面。',
-        ExperiencePhase.platformRestored => '从这里北望，宫城的中轴曾一座接一座展开。',
-        ExperiencePhase.questionAnswer => '命令由我下达，结果也不能由旁人替我承担。',
-        ExperiencePhase.platformSouthView => '向南再看一会儿。这里不会强迫你离开。',
+        ExperiencePhase.platformRestored => '中间最大的是奉天殿。两侧有楼，右边是文楼，左边是武楼。',
+        ExperiencePhase.questionAnswer => '决定仍归我。我的本意，不能替结果开脱。',
+        ExperiencePhase.platformSouthView => '再向南看。御道两侧曾列着文武官员办公的衙门。',
         ExperiencePhase.groundArrival => '这是地面固定观察点，请先确认站稳。',
-        ExperiencePhase.groundObserve => '从地面观察中轴，不模拟城台俯视。',
-        ExperiencePhase.groundRestored => '画面是绘画化空间想象，不是实时 AR。',
+        ExperiencePhase.groundObserve => '从地面观察御道空间，不模拟城台俯视。',
+        ExperiencePhase.groundRestored => '画面是绘画化空间复原，不是实时 AR。',
         ExperiencePhase.walkToEnding => '向午门南侧安全回望点行走。',
-        ExperiencePhase.wumenSouthEnding => '回头再看一眼午门，不替历史编造结局。',
+        ExperiencePhase.wumenSouthEnding => '不必把你刚才走过的路，当作我的逃路。',
         _ => '请按现场提示继续。',
       };
 }

@@ -43,7 +43,7 @@ class ProjectAudioCoordinator {
             id: 'fengtian-s01',
             startMs: 0,
             endMs: 5904,
-            subtitle: '你站着的地方，曾经是宫城最重要的轴线。',
+            subtitle: '你现在站的地方，从前在我的宫城里。',
             evidenceIds: ['E-A-001', 'E-C-001'])
       ]),
     ),
@@ -54,7 +54,7 @@ class ProjectAudioCoordinator {
             id: 'walk-s01',
             startMs: 0,
             endMs: 4776,
-            subtitle: '沿着御道向南走，前面就是午门。',
+            subtitle: '沿着宫城正中的御道，一座接一座排开。',
             evidenceIds: ['E-A-002', 'E-C-002'])
       ]),
     ),
@@ -65,7 +65,7 @@ class ProjectAudioCoordinator {
             id: 'arrival-s01',
             startMs: 0,
             endMs: 6360,
-            subtitle: '前面是午门，请确认安全位置。',
+            subtitle: '前面是午门。我在位时，它曾改称端门。',
             evidenceIds: ['E-A-003'])
       ]),
     ),
@@ -76,13 +76,13 @@ class ProjectAudioCoordinator {
             id: 'platform-s01',
             startMs: 0,
             endMs: 6200,
-            subtitle: '从这里北望，宫城的中轴曾一座接一座展开。',
+            subtitle: '中间最大的是奉天殿。两侧有楼，右边是文楼，左边是武楼。',
             evidenceIds: ['E-A-004', 'E-B-001']),
         NarrationSegment(
             id: 'platform-s02',
             startMs: 6200,
             endMs: 12168,
-            subtitle: '这些画面是依据史料形成的绘画化空间想象。',
+            subtitle: '我很喜欢在较小的便殿里，召来学士讨论《周礼》。',
             evidenceIds: ['E-B-002', 'E-C-003']),
       ]),
     ),
@@ -93,7 +93,7 @@ class ProjectAudioCoordinator {
             id: 'answer-s01',
             startMs: 0,
             endMs: 6480,
-            subtitle: '命令由我下达，结果也不能由旁人替我承担。',
+            subtitle: '决定仍归我。我的本意，不能替结果开脱。',
             evidenceIds: ['E-B-003'])
       ]),
     ),
@@ -104,7 +104,7 @@ class ProjectAudioCoordinator {
             id: 'ground-s01',
             startMs: 0,
             endMs: 6624,
-            subtitle: '你现在看到的是地面固定视点，不是城台俯视。',
+            subtitle: '这是地面固定视点的绘画化空间复原，不模拟城台俯视。',
             evidenceIds: ['E-C-004'])
       ]),
     ),
@@ -115,7 +115,7 @@ class ProjectAudioCoordinator {
             id: 'ending-s01',
             startMs: 0,
             endMs: 8112,
-            subtitle: '回头再看一眼午门，离开宫城并不等于替历史编造结局。',
+            subtitle: '不必把你刚才走过的路，当作我的逃路。',
             evidenceIds: ['E-C-005'])
       ]),
     ),
