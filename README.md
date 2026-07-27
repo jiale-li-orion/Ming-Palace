@@ -54,17 +54,17 @@ adb install -r build/app/outputs/flutter-apk/app-debug.apk
 
 ## 团队成员：快速安装
 
-如果你是团队测试成员，不需要搭建 Flutter 环境。直接从 GitHub Releases 下载预构建 APK：
+不需要搭建 Flutter 环境，不需要 adb。**在手机上操作：**
 
-1. 打开 https://github.com/jiale-li-orion/Ming-Palace/releases/tag/v0.6.0-demo
-2. 下载 Assets 中的 `app-debug.apk`（约 154 MB）
-3. 通过 adb 安装到 Android 真机（最低 Android 8.0）：
-
-```bash
-adb install -r app-debug.apk
+**① 用手机浏览器打开下面链接，下载 APK：**
 ```
+https://github.com/jiale-li-orion/Ming-Palace/releases/download/v0.6.0-demo/app-debug.apk
+```
+（或扫描 GitHub Release 页面的二维码：https://github.com/jiale-li-orion/Ming-Palace/releases/tag/v0.6.0-demo）
 
-或在手机浏览器中直接下载 APK 文件后点击安装（需在设置中启用"允许安装未知来源应用"）。
+**② 下载完成后点击 APK 文件 → 选择"安装"**（如提示"禁止安装未知来源应用"，先去系统设置中开启授权，通常位于「设置 → 安全 → 安装未知应用」）。
+
+**③ 打开应用，开始体验。**
 
 ### 真机验收检查项
 
