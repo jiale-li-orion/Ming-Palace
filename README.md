@@ -52,6 +52,36 @@ sha256sum build/app/outputs/flutter-apk/app-debug.apk
 adb install -r build/app/outputs/flutter-apk/app-debug.apk
 ```
 
+## 团队成员：快速安装
+
+如果你是团队测试成员，不需要搭建 Flutter 环境。直接从 GitHub Releases 下载预构建 APK：
+
+1. 打开 https://github.com/jiale-li-orion/Ming-Palace/releases/tag/v0.6.0-demo
+2. 下载 Assets 中的 `app-debug.apk`（约 154 MB）
+3. 通过 adb 安装到 Android 真机（最低 Android 8.0）：
+
+```bash
+adb install -r app-debug.apk
+```
+
+或在手机浏览器中直接下载 APK 文件后点击安装（需在设置中启用"允许安装未知来源应用"）。
+
+### 真机验收检查项
+
+安装后请按以下场景验证，结果反馈在团队群中：
+
+- [ ] 离线冷启动 → 显示欢迎页
+- [ ] 正常路线完整走完 → 问卷 → 导出
+- [ ] 地面路线完整走完 → 问卷 → 导出
+- [ ] 拒绝定位权限后 → 可手动推进
+- [ ] 模拟偏航 → 音频暂停
+- [ ] 横屏旋转 → 不触发状态跳变
+- [ ] 安全阶段（上楼/下楼）→ 黑色警示页
+- [ ] 播放中切后台 → 返回后不跳段
+- [ ] 强杀应用后重启 → 可恢复会话
+- [ ] 标题 7 击 → 操作员面板可用
+- [ ] 临时音频标签和路线未校准提示可见
+
 ## 数据与隐私
 
 事件逐行写入应用文档目录的 `telemetry.jsonl`，不上传服务器。完成页导出当前会话，操作员面板可查看最近日志或导出全部日志。字段见 [遥测 Schema](docs/telemetry-schema.md)。
