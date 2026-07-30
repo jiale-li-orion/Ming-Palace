@@ -1,0 +1,119 @@
+/* 传统色与《07》体验层基础布局；户外可读性待现场强光验收 */
+
+:root {
+  --color-paper: #f5f0e6;
+  --color-ink: #1a1a1a;
+  --color-band: rgba(0, 0, 0, 0.72);
+  --color-accent: #8b4513;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --instruction-height: 28vh;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--color-ink);
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+/* 行走段：说明带贴物理上沿（竖持时屏幕顶部） */
+.instruction-band {
+  flex: 0 0 auto;
+  max-height: var(--instruction-height);
+  padding: 12px 16px;
+  background: var(--color-band);
+  color: #fff;
+  z-index: 10;
+}
+
+.instruction-band__text {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.instruction-band__btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 16px;
+}
+
+.stage {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-ink);
+  overflow: hidden;
+}
+
+.stage__letterbox {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--color-paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage__placeholder {
+  margin: 0;
+  padding: 16px;
+  color: var(--color-ink);
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.subtitle-rail {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 18%;
+  max-width: 72px;
+  padding: 8px 4px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 14px;
+  z-index: 5;
+}
+
+.subtitle-rail[hidden] {
+  display: none;
+}
+
+/* 停驻横屏观察域（后续由 JS 切换 app--landscape-observe） */
+.app--landscape-observe .instruction-band {
+  display: none;
+}
+
+.app--landscape-observe .subtitle-rail {
+  display: block;
+}

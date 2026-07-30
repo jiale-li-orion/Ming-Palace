@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>精游 · 明故宫 · rebuild/0802</title>
+    <link rel="stylesheet" href="src/styles/base.css" />
+  </head>
+  <body>
+  <!-- 行走段默认竖持；停驻点向左转屏后进入横屏观察（见《03》概念表第 4 节） -->
+    <div id="app" class="app app--portrait-walk">
+      <header class="instruction-band" id="instruction-band">
+        <p class="instruction-band__text" id="instruction-text">
+          重建分支已就绪。说明带贴物理上沿，此处为全屏唯一可点区域。
+        </p>
+        <button type="button" class="instruction-band__btn" id="btn-start">
+          开始（占位）
+        </button>
+      </header>
+
+      <main class="stage" id="stage">
+        <div class="stage__letterbox" id="letterbox">
+          <p class="stage__placeholder">
+            信箱区：横屏画面将显示在这里。当前为准备工作占位页。
+          </p>
+        </div>
+      </main>
+
+      <aside class="subtitle-rail" id="subtitle-rail" hidden>
+        <p class="subtitle-rail__line">竖排字幕区（观察段显示）</p>
+      </aside>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

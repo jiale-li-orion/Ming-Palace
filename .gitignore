@@ -1,0 +1,30 @@
+# 依赖与构建产物（见《07》第 4 节）
+node_modules/
+dist/
+tmp/
+.output/
+
+# 本地与环境
+.env
+.env.*
+*.local
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# 大体积原始素材不进普通 Git（压缩后放 assets/runtime/，超大文件用 LFS）
+*.zip
+*.psd
+*.ai
+
+# 测试录屏与临时导出
+*.screenrecording
+coverage/
+
+# 密钥
+*.pem
+credentials.json
